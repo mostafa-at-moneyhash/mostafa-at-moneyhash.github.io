@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoneyHash, PM Case Assessment</title>
+<style>
+  :root{
+    --navy:#0A1E3F;       /* deep brand navy (bg) */
+    --navy-2:#0E274F;     /* raised navy surface */
+    --navy-3:#14315E;     /* card navy */
+    --ink:#0A1E3F;        /* navy ink on light */
+    --ink-2:#35435C;      /* muted navy text on light */
+    --muted:#6B7690;      /* secondary text on light */
+    --muted-d:#9FB0CC;    /* secondary text on navy */
+    --blue:#2D6BE0;       /* MoneyHash CTA blue */
+    --blue-soft:#E4EDFC;  /* blue tint */
+    --peach:#F5C99A;      /* headline accent peach */
+    --peach-2:#F0B87E;    /* deeper peach */
+    --paper:#FFFFFF;
+    --wash:#F5F7FB;       /* light page bg */
+    --line:#E2E7F1;       /* hairline on light */
+    --line-d:#22375F;     /* hairline on navy */
+    --green:#1D9E75;
+    --amber:#BA7517;
+    --red:#D8482F;
+    --radius:14px;
+    --maxw:1000px;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--wash);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    font-size:16px;
+  }
+  a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(45,107,224,.35)}
+  a:hover{text-decoration:none;border-bottom-color:var(--blue)}
+  a.src-link{font-weight:600;white-space:nowrap}
+  a.src-link::after{content:" ↗";font-size:.85em;opacity:.7}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;top:14px;z-index:50;
+    max-width:var(--maxw);
+    margin:14px 20px 0;
+    background:var(--navy);
+    border-radius:18px;
+    box-shadow:0 10px 30px rgba(10,30,63,.18), 0 2px 8px rgba(10,30,63,.12);
+  }
+  @media(min-width:1040px){ header{margin:14px auto 0} }
+  .bar{
+    display:flex;align-items:center;gap:20px;
+    padding:12px 24px;
+  }
+  .logo-img{height:46px;width:auto;display:block;image-rendering:auto}
+  .barmeta{margin-left:auto;font-size:13px;color:var(--muted-d);text-align:right;line-height:1.35}
+  .barmeta strong{color:#fff;font-weight:600}
+
+  /* ---------- tabs ---------- */
+  nav.tabs{
+    display:flex;justify-content:center;gap:4px;padding:0 16px 4px;
+    overflow-x:auto;
+    border-top:1px solid var(--line-d);
+    margin-top:2px;
+  }
+  nav.tabs button{
+    font-family:inherit;font-size:14.5px;font-weight:600;
+    color:var(--muted-d);background:none;border:none;cursor:pointer;
+    padding:12px 16px 10px;border-bottom:2.5px solid transparent;
+    white-space:nowrap;transition:color .15s;
+  }
+  nav.tabs button:hover{color:#fff}
+  nav.tabs button.active{color:var(--peach);border-bottom-color:var(--peach)}
+
+  /* ---------- layout ---------- */
+  main{max-width:var(--maxw);margin:0 auto;padding:38px 24px 90px}
+  .panel{display:none;animation:fade .35s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .eyebrow{
+    display:inline-block;font-size:12px;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--blue);margin-bottom:10px;
+  }
+  h1{font-size:34px;line-height:1.12;letter-spacing:-.025em;font-weight:800;margin-bottom:8px}
+  h2{font-size:23px;line-height:1.2;letter-spacing:-.02em;font-weight:750;margin:34px 0 12px;padding-top:6px}
+  h3{font-size:16.5px;font-weight:700;margin:22px 0 8px;color:var(--ink)}
+  p{margin-bottom:12px;color:var(--ink-2)}
+  .lead{font-size:18px;color:var(--ink-2);max-width:70ch;margin-bottom:6px}
+  ul,ol{margin:6px 0 14px 2px;padding-left:20px}
+  li{margin-bottom:7px;color:var(--ink-2)}
+  strong{color:var(--ink);font-weight:650}
+  code{
+    font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;
+    font-size:13.5px;background:var(--blue-soft);color:#1B4DA8;
+    padding:1.5px 6px;border-radius:5px;
+  }
+
+  /* hero pitch block */
+  .pitch{
+    background:var(--navy);color:#fff;border-radius:var(--radius);
+    padding:32px 34px;margin:20px 0 8px;position:relative;overflow:hidden;
+  }
+  .pitch .kicker{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--peach);margin-bottom:12px}
+  .pitch h2{color:#fff;font-size:28px;margin:0 0 12px;padding:0;letter-spacing:-.02em;line-height:1.2}
+  .pitch h2 em{color:var(--peach);font-style:normal}
+  .pitch p{color:var(--muted-d);margin:0;font-size:16px}
+
+  /* cards / callouts */
+  .card{
+    background:var(--paper);border:1px solid var(--line);
+    border-radius:var(--radius);padding:20px 22px;margin:14px 0;
+  }
+  .painpoints{display:grid;gap:12px;margin:16px 0}
+  @media(min-width:720px){.painpoints{grid-template-columns:repeat(3,1fr)}}
+  .pp{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 18px 16px;border-top:3px solid var(--blue)}
+  .pp h4{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--ink)}
+  .pp p{font-size:14px;margin:0;color:var(--muted)}
+
+  .note{
+    border-left:3px solid var(--blue);background:var(--blue-soft);
+    border-radius:0 10px 10px 0;padding:13px 16px;margin:14px 0;
+    font-size:14px;color:#25467e;
+  }
+  .note strong{color:#173a72}
+  .flag{
+    border-left:3px solid var(--amber);background:#FBF3E3;
+    border-radius:0 10px 10px 0;padding:13px 16px;margin:14px 0;font-size:14px;color:#6b4a10;
+  }
+  .flag strong{color:#6b4a10}
+
+  /* tables */
+  .tablewrap{overflow-x:auto;margin:14px 0;border-radius:12px;border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--paper);overflow:hidden}
+  th,td{text-align:left;padding:13px 15px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+  th{background:var(--navy);font-weight:650;color:#fff;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover td, table tr:hover td{background:#FAFBFE}
+  td strong{color:var(--ink)}
+  /* first-column emphasis for label tables */
+  table td:first-child{font-weight:600;color:var(--ink)}
+
+  .panel > h2{color:var(--ink)}
+  .panel > h2::before{content:"";display:inline-block;width:16px;height:2.5px;background:var(--peach-2);vertical-align:middle;margin-right:10px;border-radius:2px;transform:translateY(-4px)}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:.02em;vertical-align:middle}
+  .tag.src{background:var(--blue-soft);color:#1B4DA8}
+  .tag.mine{background:#EDE9FB;color:#4b3fb0}
+  .tag.fix{background:#E1F5EE;color:#0F6E56}
+
+  /* ---- enhanced tables ---- */
+  /* two-column contrast split (changes vs stays same) */
+  .split{display:grid;gap:14px;margin:18px 0}
+  @media(min-width:680px){.split{grid-template-columns:1fr 1fr}}
+  .split .col{border-radius:var(--radius);padding:20px 22px;border:1px solid var(--line)}
+  .split .col.change{background:linear-gradient(180deg,#FBF1E4,#FFFFFF 70%);border-color:#EBD9BF}
+  .split .col.same{background:linear-gradient(180deg,#EAF0FB,#FFFFFF 70%);border-color:#D3E0F5}
+  .split .col .h{display:flex;align-items:center;gap:9px;font-weight:750;font-size:14px;margin-bottom:10px;letter-spacing:.01em}
+  .split .col.change .h{color:#8a5a12}
+  .split .col.same .h{color:#1B4DA8}
+  .split .col .ic{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex:none;font-weight:800}
+  .split .col.change .ic{background:#F0D6AE;color:#7a4d0c}
+  .split .col.same .ic{background:#CFE0F8;color:#1B4DA8}
+  .split .col ul{margin:0;padding-left:18px}
+  .split .col li{font-size:14px;margin-bottom:8px;color:var(--ink-2)}
+  .split .col li:last-child{margin-bottom:0}
+
+  /* problem table with difficulty + build columns */
+  .tablewrap:has(table.rich){border:none}
+  table.rich{border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px}
+  table.rich td:first-child{font-weight:400;color:var(--ink-2)}
+  table.rich th{background:var(--navy);color:#fff;font-weight:650;font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;padding:11px 14px}
+  table.rich th:first-child{border-top-left-radius:12px}
+  table.rich th:last-child{border-top-right-radius:12px}
+  table.rich td{padding:15px 14px;border-bottom:1px solid var(--line);font-size:14px}
+  table.rich tr:last-child td{border-bottom:none}
+  table.rich tr:hover td{background:#FAFBFE}
+  .prob-name{font-weight:700;color:var(--ink);display:block;margin-bottom:3px}
+  .prob-sub{color:var(--muted);font-size:13px}
+  .diff{display:inline-flex;gap:3px;align-items:center}
+  .diff .dot{width:7px;height:7px;border-radius:50%;background:#DDE3EE}
+  .diff .dot.on{background:var(--blue)}
+  .diff .dot.hi{background:var(--red)}
+  .buildcell{color:var(--ink-2)}
+
+  /* ---- user story block ---- */
+  .story{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--paper);margin:16px 0}
+  .story .sec{padding:16px 20px;border-bottom:1px solid var(--line)}
+  .story .sec:last-child{border-bottom:none}
+  .story .lbl2{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+  .story .title-line{font-size:16px;font-weight:700;color:var(--ink);margin:0}
+  .story .desc{font-size:14.5px;color:var(--ink-2);margin:0}
+  .story .desc em{color:var(--ink);font-style:normal;font-weight:600}
+  .story ul{margin:0;padding-left:18px}
+  .story li{font-size:14px;margin-bottom:7px;color:var(--ink-2)}
+  .story li:last-child{margin-bottom:0}
+  .story .affected{display:flex;flex-wrap:wrap;gap:8px}
+  .story .achip{font-size:12.5px;font-weight:600;background:#EAF0FB;color:#1B4DA8;padding:5px 12px;border-radius:20px;border:1px solid #D3E0F5}
+
+  /* ---- approach note (intro at top of each part) ---- */
+  .approach-note{
+    display:flex;gap:12px;align-items:flex-start;
+    background:linear-gradient(180deg,#EAF0FB,#FFFFFF 80%);
+    border:1px solid #D3E0F5;border-left:3px solid var(--blue);
+    border-radius:12px;padding:14px 18px;margin:14px 0 22px;
+  }
+  .approach-note .an-ic{flex:none;width:26px;height:26px;border-radius:7px;background:#D3E0F5;color:#1B4DA8;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;margin-top:1px}
+  .approach-note p{margin:0;font-size:13.5px;color:#274a7d}
+  .approach-note strong{color:#173a72}
+
+  /* ---- my-approach tab ---- */
+  .steps-tl{position:relative;margin:18px 0 6px;padding-left:34px}
+  .steps-tl::before{content:"";position:absolute;left:10px;top:8px;bottom:8px;width:2px;background:var(--line);transform:translateX(-50%)}
+  .tl-item{position:relative;margin-bottom:20px}
+  .tl-item::before{content:"";position:absolute;left:-24px;top:5px;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--blue);box-sizing:content-box;transform:translateX(-50%)}
+  .tl-item h4{font-size:15.5px;font-weight:700;color:var(--ink);margin-bottom:4px}
+  .tl-item p{font-size:14px;color:var(--ink-2);margin:0}
+  .tl-item .ai{display:inline-block;margin-top:7px;font-size:12.5px;color:#4b3fb0;background:#EDE9FB;border:1px solid #DAD3F5;padding:3px 10px;border-radius:20px;font-weight:600}
+  .ai-grid{display:grid;gap:12px;margin:16px 0}
+  @media(min-width:680px){.ai-grid{grid-template-columns:1fr 1fr}}
+  .ai-card{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--paper)}
+  .ai-card.did{border-top:3px solid var(--green)}
+  .ai-card.didnt{border-top:3px solid var(--amber)}
+  .ai-card h4{font-size:14px;font-weight:750;margin-bottom:9px;display:flex;align-items:center;gap:8px}
+  .ai-card.did h4{color:#0F6E56}
+  .ai-card.didnt h4{color:#8a5a12}
+  .ai-card ul{margin:0;padding-left:17px}
+  .ai-card li{font-size:13.5px;margin-bottom:6px;color:var(--ink-2)}
+  .ai-card li:last-child{margin-bottom:0}
+  .princ{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0}
+  .princ span{font-size:13px;font-weight:600;background:var(--navy);color:#fff;padding:6px 14px;border-radius:20px}
+
+  /* ---- scope columns ---- */
+  .scope-cols{display:grid;gap:12px;margin:16px 0}
+  @media(min-width:720px){.scope-cols{grid-template-columns:1fr 1fr}}
+  .scope-col{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--paper)}
+  .scope-col .sh{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:750;letter-spacing:.03em;text-transform:uppercase;margin-bottom:11px}
+  .scope-col .sh .si{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex:none}
+  .scope-col.in{border-top:3px solid var(--green)}
+  .scope-col.in .sh{color:#0F6E56} .scope-col.in .si{background:#D6F0E5;color:#0F6E56}
+  .scope-col.def{border-top:3px solid var(--amber)}
+  .scope-col.def .sh{color:#8a5a12} .scope-col.def .si{background:#F5E4C4;color:#8a5a12}
+  .scope-col.met{border-top:3px solid var(--blue)}
+  .scope-col.met .sh{color:#1B4DA8} .scope-col.met .si{background:#D8E5FA;color:#1B4DA8}
+  .scope-col ul{margin:0;padding-left:0;list-style:none}
+  .scope-col li{font-size:14px;color:var(--ink-2);padding:5px 0 5px 20px;position:relative;line-height:1.5}
+  .scope-col li::before{content:"";position:absolute;left:2px;top:11px;width:6px;height:6px;border-radius:50%}
+  .scope-col.in li::before{background:var(--green)}
+  .scope-col.def li::before{background:var(--amber)}
+  .scope-col.met li::before{background:var(--blue)}
+  .scope-col li em{color:var(--muted);font-style:normal;font-size:13px}
+  .scope-col.wide{grid-column:1/-1}
+
+  /* ---- problem breakdown grid ---- */
+  .prob-grid{display:grid;gap:10px;margin:14px 0}
+  @media(min-width:640px){.prob-grid{grid-template-columns:1fr 1fr}}
+  .prob-cell{display:flex;gap:11px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .prob-cell .n{flex:none;width:24px;height:24px;border-radius:7px;background:var(--navy);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .prob-cell span.t{font-size:14px;color:var(--ink);font-weight:600;line-height:1.35;padding-top:2px}
+
+  /* ---- solution flow steps ---- */
+  .sol-flow{margin:16px 0}
+  .sol-step{display:flex;gap:13px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line)}
+  .sol-step:last-child{border-bottom:none}
+  .sol-step .badge{flex:none;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:4px 10px;border-radius:20px;margin-top:2px;white-space:nowrap;min-width:92px;text-align:center}
+  .sol-step .badge.src{background:var(--blue-soft);color:#1B4DA8}
+  .sol-step .badge.rec{background:#E1F5EE;color:#0F6E56}
+  .sol-step .badge.lim{background:#FAEEDA;color:#8a5a12}
+  .sol-step .badge.mine{background:#EDE9FB;color:#4b3fb0}
+  .sol-step .body{font-size:14px;color:var(--ink-2);line-height:1.55}
+  .sol-step .body strong{color:var(--ink)}
+
+  /* ---- profile / contact header ---- */
+  .profile{
+    display:flex;flex-wrap:wrap;align-items:center;gap:18px;
+    background:var(--navy);border-radius:var(--radius);
+    padding:22px 26px;margin:14px 0 8px;color:#fff;
+  }
+  .profile .pl{flex:1 1 auto;min-width:200px}
+  .profile .nm{font-size:23px;font-weight:800;letter-spacing:.12em;margin-bottom:4px}
+  .profile .ttl{font-size:13.5px;font-weight:600;color:var(--peach);letter-spacing:.04em;margin-bottom:12px}
+  .profile .contact{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px}
+  .profile .contact a,.profile .contact span{color:var(--muted-d);border:none;display:inline-flex;align-items:center;gap:6px}
+  .profile .contact a:hover{color:#fff}
+  .profile .contact .ci{opacity:.7}
+
+  /* ---- outcome branch visual ---- */
+  .branches{margin:16px 0;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--paper)}
+  .branches .bhead{background:var(--navy);color:#fff;font-weight:650;font-size:13.5px;padding:12px 18px;display:flex;align-items:center;gap:10px}
+  .branches .bhead .chip{font-size:11px;font-weight:700;background:rgba(255,255,255,.16);padding:2px 9px;border-radius:20px;letter-spacing:.03em}
+  .brow{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;border-bottom:1px solid var(--line)}
+  .brow:last-child{border-bottom:none}
+  .brow .cond{flex:none;width:150px;font-weight:650;font-size:13.5px;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .brow .arrow{color:var(--muted);flex:none;padding-top:1px}
+  .brow .out{font-size:14px;color:var(--ink-2)}
+  .brow .out strong{color:var(--ink)}
+  .bdot{width:9px;height:9px;border-radius:50%;flex:none}
+  .bdot.ok{background:var(--green)}
+  .bdot.warn{background:var(--amber)}
+  .bdot.bad{background:var(--red)}
+  /* highlighted nested timeout case */
+  .brow.hl{background:#FBF3E3;border-bottom:1px solid #EFE0BF;flex-direction:column;gap:10px}
+  .brow.hl .toprow{display:flex;align-items:center;gap:14px;width:100%}
+  .brow.hl .cond{color:#7a4d0c}
+  .brow.hl .tag-hard{margin-left:auto;font-size:10.5px;font-weight:700;background:#F0D6AE;color:#7a4d0c;padding:2px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+  .subtree{display:grid;gap:8px;padding-left:26px;width:100%}
+  .subrow{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-2)}
+  .subrow .sarr{color:#c79a4e}
+  .subrow strong{color:var(--ink)}
+
+  /* pre / code flow */
+  pre{
+    background:var(--ink);color:#D7DEEE;border-radius:12px;
+    padding:18px 20px;overflow-x:auto;font-size:13px;line-height:1.7;
+    margin:14px 0;font-family:'SF Mono',ui-monospace,Menlo,Consolas,monospace;
+  }
+  pre .c-ok{color:#7BE0B4}
+  pre .c-warn{color:#F0B968}
+  pre .c-bad{color:#F2938A}
+  pre .c-dim{color:#8793Ad}
+
+  /* diagram frame */
+  .diagram{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px 16px;margin:18px 0}
+  .diagram svg{width:100%;height:auto;display:block}
+  .caption{font-size:13px;color:var(--muted);text-align:center;margin-top:8px;padding:0 12px}
+
+  .merchant{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    margin:16px 0;overflow:hidden;
+  }
+  .merchant .mhead{background:var(--wash);border-bottom:1px solid var(--line);padding:12px 24px}
+  .merchant .mrow{font-size:12.5px;color:var(--muted);line-height:1.7}
+  .merchant .mrow b{color:var(--ink-2);font-weight:600;display:inline-block;min-width:52px}
+  .merchant .mbody{padding:20px 24px}
+  .merchant h4{font-size:15px;color:var(--blue);margin-bottom:12px;font-weight:750}
+  .merchant p{font-size:14.5px}
+  .merchant .lbl{font-weight:700;color:var(--ink)}
+  .merchant .sig{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+  .merchant .sig .nm{font-weight:700;color:var(--ink);font-size:14.5px}
+  .merchant .sig .rl{color:var(--muted);font-size:13px}
+
+  .divider{height:1px;background:var(--line);margin:30px 0}
+
+  /* about placeholder */
+  .placeholder{
+    border:2px dashed var(--line);border-radius:var(--radius);
+    padding:48px 32px;text-align:center;color:var(--muted);margin-top:24px;
+  }
+  .placeholder .big{font-size:42px;margin-bottom:12px;color:var(--peach-2)}
+  .placeholder h3{color:var(--ink);margin-bottom:6px}
+
+  footer{max-width:var(--maxw);margin:0 auto;padding:26px 24px 40px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  footer strong{color:var(--ink);font-weight:700}
+
+  /* svg diagram shared text styles */
+  .dt{font-family:var(--sans);font-size:13px;font-weight:600;fill:var(--ink)}
+  .dts{font-family:var(--sans);font-size:11.5px;font-weight:500;fill:var(--muted)}
+  .dlbl{font-family:var(--sans);font-size:11px;font-weight:600;fill:var(--muted)}
+
+  @media(max-width:640px){
+    h1{font-size:27px}.lead{font-size:16px}
+    .pitch{padding:24px}.pitch h2{font-size:22px}
+    main{padding:28px 16px 70px}
+    .barmeta{display:none}
+    .brow{flex-wrap:wrap}
+    .brow .cond{width:100%}
+    .brow .arrow{display:none}
+    .brow.hl .toprow{flex-wrap:wrap}
+    .brow.hl .tag-hard{margin-left:0}
+    nav.tabs{justify-content:flex-start}
+  }
+
+  @media print{
+    /* Evaluators often print or save to PDF, so show every part, not just the active tab */
+    header{position:static;box-shadow:none;margin:0 0 16px;border-radius:0}
+    nav.tabs{display:none}
+    .panel{display:block !important;page-break-before:always;padding-top:8px}
+    .panel:first-of-type{page-break-before:auto}
+    body{background:#fff;font-size:11pt}
+    main{max-width:none;padding:0 0 20px}
+    a{border-bottom:none}
+    a.src-link::after{content:" (" attr(href) ")";font-size:.75em;color:#666;white-space:normal}
+    .diagram,.branches,.story,.card,.scope-col,.prob-cell,.sol-step,.merchant,.ai-card{page-break-inside:avoid}
+    h2,h3{page-break-after:avoid}
+    footer{page-break-before:avoid}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <img class="logo-img" src="data:image/png;base64,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" alt="MoneyHash">
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="active" data-tab="about">My Approach</button>
+    <button data-tab="p1">Part 1 · Positioning &amp; ICP</button>
+    <button data-tab="p2">Part 2 · Hawil Auto Top-Up</button>
+    <button data-tab="p3">Part 3 · Troubleshooting</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ================= PART 1 ================= -->
+<section class="panel" id="p1">
+  <span class="eyebrow">Part 1</span>
+  <h1>Positioning &amp; ICP</h1>
+  <p class="lead">What MoneyHash is, who it's for, and what agent-initiated payments change from here.</p>
+  <div class="approach-note">
+    <span class="an-ic">→</span>
+    <p><strong>How I approached this:</strong> I led with a sharp opinion rather than a textbook summary, then pressure-tested every claim, marking what's sourced from MoneyHash vs. my own judgment, so each line is one I can defend live.</p>
+  </div>
+
+  <h2>1 · Value proposition</h2>
+  <div class="pitch">
+    <div class="kicker">The sharpest version</div>
+    <h2>One integration. <em>Every rail.</em> Built for emerging markets.</h2>
+    <p>MoneyHash gives merchants the local payment methods and failover paths that emerging markets need. The result: higher success rates, lower costs, and revenue recovered instead of lost to provider downtime. The sharper way to say it: payment infrastructure is a growth lever here, not a backend cost, because in these markets the rails are often what decides whether revenue lands at all.</p>
+  </div>
+  <p>Top three pain points a payments orchestrator solves:</p>
+  <div class="painpoints">
+    <div class="pp"><h4>Recover revenue the rails quietly drop</h4><p>Merchants can add every local method and still lose sales when the underlying rails silently fail a transaction. Routing and retry across providers recovers payments that would otherwise just fail. MoneyHash cites failure rates 2–3× the global average in these markets.</p></div>
+    <div class="pp"><h4>Reach every customer</h4><p>Cards, mada, STC Pay, Fawry, wallets, BNPL, through one API instead of five separate integrations, so no sale is lost because a preferred method wasn't supported. Necessary, but on its own not enough; the rails behind them decide whether the payment actually goes through.</p></div>
+    <div class="pp"><h4>Ops on autopilot</h4><p>One dashboard instead of five reconciliation spreadsheets. Engineers ship product instead of maintaining processor integrations.</p></div>
+  </div>
+  <div class="note"><strong>On the numbers:</strong> the 2–3× failure-rate figure is <strong>company-stated</strong> (<a class="src-link" href="https://moneyhash.io/blog/pre-a-funding" target="_blank" rel="noopener">source</a>, CEO Nader Abdelrazik), not independently verified. I'm citing it as MoneyHash's own positioning, not as neutral market data.</div>
+
+  <h2>2 · Ideal customer profile: Marketplaces</h2>
+  <div class="tablewrap">
+    <table>
+      <tr><th style="width:130px">Dimension</th><th>Profile</th></tr>
+      <tr><td><strong>Size</strong></td><td>Enterprise-scale, thousands of active third-party sellers, meaningful volume. Orchestration's value-adds (routing, split payouts, reconciliation) carry integration cost that only pays off past a volume threshold; below it, a single PSP is simpler.</td></tr>
+      <tr><td><strong>Geography</strong></td><td>Multi-country GCC/MENA, e.g. UAE + Saudi + Egypt at once, each with different local rails and rules. Matches how MoneyHash positions itself: a regional specialist, not a global platform, its edge is deep local rail coverage.</td></tr>
+      <tr><td><strong>Complexity</strong></td><td>Two-sided money movement, collect from buyers <em>and</em> split/settle payouts to sellers, plus multi-currency reporting and high-frequency transactions.</td></tr>
+    </table>
+  </div>
+  <p>Concretely: <strong>noon</strong> (real, multi-vendor, GCC/Egypt). Delivery marketplaces like <strong>Talabat</strong> illustrate the same pattern (thousands of restaurant payouts), illustrative, not a confirmed MoneyHash customer.</p>
+
+  <h3>Capabilities that matter most</h3>
+  <ul>
+    <li><strong>Smart routing &amp; retry:</strong> every recovered decline is direct GMV, and it compounds fast at volume.</li>
+    <li><strong>Split payments / payouts:</strong> settling take-rate to thousands of sellers isn't something most direct-PSP integrations handle well.</li>
+    <li><strong>Unified reconciliation:</strong> reconciling seller payouts by hand across providers doesn't scale past a few hundred sellers.</li>
+    <li><strong>Local payment method coverage:</strong> buyers are price-sensitive, and local methods measurably lift conversion. (BNPL like Tabby and Tamara is increasingly standard in-region, though no hard adoption data is cited.)</li>
+  </ul>
+
+  <h3>Integrations that matter most</h3>
+  <ul>
+    <li><strong>Card schemes + 3DS:</strong> baseline; 3DS also shifts fraud liability to the issuer, which matters at scale.</li>
+    <li><strong>Regional methods (STC Pay, mada):</strong> STC Pay is a wallet; mada is Saudi Arabia's domestic debit card scheme (not a wallet). mada is the dominant KSA debit rail, so skipping it loses a large share of Saudi buyers.</li>
+    <li><strong>BNPL (Tabby, Tamara):</strong> increasingly standard at checkout in-region; lifts basket size for price-sensitive buyers.</li>
+    <li><strong>Payout / disbursement rail:</strong> a standard PSP has no concept of holding funds and routing a slice to a separate, KYC'd seller. This is why Stripe Connect / Adyen for Platforms exist as their own category. <em>(Worth confirming whether MoneyHash provides split payouts natively or orchestrates them to a specialist provider; either way, it's the marketplace-specific need to design around.)</em></li>
+  </ul>
+  <div class="card"><strong>Not a fit:</strong> single-seller Salla/Zid storefronts, one merchant, one payout account, no split-payment need. The marketplace value only appears once you <em>are</em> the aggregator, not a shop on someone else's platform.</div>
+
+  <h2>3 · The agentic frontier</h2>
+  <p>When the buyer is software acting for a person, some things break and some things hold. Separating the two is the whole game:</p>
+  <div class="split">
+    <div class="col change">
+      <div class="h"><span class="ic">↑</span> What genuinely changes</div>
+      <ul>
+        <li>Trust shifts from "this browser has a valid card session" to "this agent holds <strong>scoped, revocable authorization</strong> from a real person."</li>
+        <li>Consent, spend limits, and dispute attribution must be re-architected around <strong>delegated authority</strong>, not a live human clicking "pay."</li>
+        <li>Transaction <strong>volume per human decision</strong> rises sharply, many small charges triggered with little oversight.</li>
+      </ul>
+    </div>
+    <div class="col same">
+      <div class="h"><span class="ic">=</span> What stays the same</div>
+      <ul>
+        <li>The rails underneath, <strong>card networks, settlement, chargebacks</strong>, don't change.</li>
+        <li>Someone still authorizes a charge, captures funds, and is <strong>accountable</strong> when it goes wrong.</li>
+        <li>The orchestration job (route, handle failure, reconcile) gets <strong>more</strong> important, not less.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Hardest problems for an orchestrator</h3>
+  <div class="tablewrap">
+    <table class="rich">
+      <tr><th style="width:34%">Problem</th><th style="width:15%">Difficulty</th><th>What MoneyHash would need to build</th></tr>
+      <tr>
+        <td><span class="prob-name">Credential scoping across networks</span><span class="prob-sub">Visa Trusted Agent Protocol, Mastercard Agent Pay, and AP2 each define scoping &amp; revocation differently.</span></td>
+        <td><span class="diff" title="High"><span class="dot hi"></span><span class="dot hi"></span><span class="dot hi"></span></span></td>
+        <td class="buildcell">One normalized API over three diverging agent-auth schemes, the same abstraction layer it already provides for human payment methods. <em>Flagged: fast-moving space, treat protocol names as directional, not verified current.</em></td>
+      </tr>
+      <tr>
+        <td><span class="prob-name">Fraud models built for humans</span><span class="prob-sub">An agent making 50 small purchases a minute reads as fraud under today's velocity rules.</span></td>
+        <td><span class="diff" title="Medium-High"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></span></td>
+        <td class="buildcell">Agent-aware risk signals, verified agent runtime, authorization scope, layered onto velocity heuristics so legitimate bursts aren't blocked.</td>
+      </tr>
+      <tr>
+        <td><span class="prob-name">Liability &amp; dispute resolution</span><span class="prob-sub">Unclear who's on the hook, agent platform, consumer, or merchant, when a purchase goes wrong.</span></td>
+        <td><span class="diff" title="High"><span class="dot hi"></span><span class="dot hi"></span><span class="dot hi"></span></span></td>
+        <td class="buildcell">A decision path that resolves this ambiguity into an actual authorize/decline call, plus contractual clarity (see recommendation below).</td>
+      </tr>
+    </table>
+  </div>
+  <div class="note"><strong>Recommendation:</strong> update merchant T&amp;Cs to define liability allocation for agent-initiated transactions <em>before</em> volume arrives, who bears the loss, what evidence proves valid delegated authorization, how chargeback timelines apply when the "cardholder" is an authorized agent. Retrofitting after disputes start is a weak position, and merchants will ask before trusting MoneyHash to route agent payments at all.</div>
+</section>
+
+<!-- ================= PART 2 ================= -->
+<section class="panel" id="p2">
+  <span class="eyebrow">Part 2 · Solution Discovery</span>
+  <h1>Hawil Auto Top-Up</h1>
+  <p class="lead">Frictionless wallet reloads that survive a provider outage. The hard part isn't the happy path, it's making sure money moves exactly once, even when a provider goes quiet mid-charge.</p>
+  <div class="approach-note">
+    <span class="an-ic">→</span>
+    <p><strong>How I approached this:</strong> in payments the expensive failure isn't "money doesn't move," it's "money moves twice." So I researched the established pattern first, then spent most of my effort on the one case that actually causes double charges: a provider timeout where you don't know if the first charge went through. That case shaped the whole design.</p>
+  </div>
+
+  <h2>1 · Frame the problem</h2>
+  <p>"Frictionless, every time, even during an outage" breaks into four sub-problems:</p>
+  <div class="prob-grid">
+    <div class="prob-cell"><span class="n">1</span><span class="t">No re-auth on repeat charges</span></div>
+    <div class="prob-cell"><span class="n">2</span><span class="t">Survives a provider outage</span></div>
+    <div class="prob-cell"><span class="n">3</span><span class="t">A trigger mechanism</span></div>
+    <div class="prob-cell"><span class="n">4</span><span class="t">Guardrails against double-charging</span></div>
+  </div>
+  <div class="flag"><strong>Assumptions (architecture-defining, so confirm with Hawil):</strong> Hawil pushes a trigger event when the balance crosses the threshold. The whole webhook and idempotency design depends on this being true. Setup is one in-app CIT (card-not-present) with a 3DS step-up; in the GCC that's effectively expected for card-not-present anyway, so I'm relying on it rather than trading it off. And a boundary worth naming: Hawil owns the wallet and its stored-value / e-money licensing (CBUAE SVF, SAMA); MoneyHash's role is the card-in leg, not holding e-money. Worth confirming that line so we're clear on who's responsible for what.</div>
+  <h3>Questions for Hawil</h3>
+  <ul>
+    <li>Does your app send us the trigger when a balance crosses the threshold, or would you expect us to track balances ourselves?</li>
+    <li>Do you already have a second provider integrated that we could fail over to?</li>
+    <li>On a hard failure (both providers down, or the card declined), should we retry silently later or notify the user right away?</li>
+    <li>Is there a cap on the top-up amount or how often it can fire per day? (Important for abuse and fraud limits.)</li>
+    <li>Roughly how many top-ups a day do you expect, and in which markets? (This shapes how many backup providers are worth wiring up, and whether mada matters.)</li>
+    <li>Any GCC regulatory limits on standing-instruction charges we should account for?</li>
+  </ul>
+
+  <h2>2 · Solution space</h2>
+  <div class="sol-flow">
+    <div class="sol-step">
+      <span class="badge src">Sourced</span>
+      <div class="body">This is a <strong>Standing Instruction</strong>: a sub-type of Merchant-Initiated Transaction (MIT), not a recurring payment. Recurring means a fixed amount on a fixed schedule; this fires on a balance event. One Customer-Initiated Transaction (CIT) captures consent, and every top-up after is a tagged MIT, specifically an <a class="src-link" href="https://developer.visaacceptance.com/docs/vas/en-us/credentials/developer/ctv/rest/credentials/credentials-intro.html" target="_blank" rel="noopener">Unscheduled Card-on-File charge</a>, which Visa defines as a non-scheduled charge under a customer's prior authorization (Mastercard's framing is equivalent, with its own tagging). A balance-triggered reload is exactly that.</div>
+    </div>
+    <div class="sol-step">
+      <span class="badge rec">Recommended</span>
+      <div class="body">Store the card as a <a class="src-link" href="https://www.visaacceptance.com/en-us/blog/article/2025/tokens-are-key-to-future-proofing-payments.html" target="_blank" rel="noopener">network token</a> with MoneyHash as the Token Requestor. A scheme-issued token can be managed across different gateways and acquirers rather than being locked to one, which is what makes it portable for failover. Pairing it with 3DS decoupling lets a retry skip re-authentication. <em>To be precise: a properly-tagged MIT is designed so no customer action is expected, but an issuer can still step up or soft-decline. So "no re-auth" is the design intent for eligible MITs, not a guarantee I can make on the issuer's behalf.</em></div>
+    </div>
+    <div class="sol-step">
+      <span class="badge lim">Limitation</span>
+      <div class="body">Portability isn't automatic. Becoming an approved Token Requestor needs scheme certification (a real onboarding lift, not a config flag), and every backup acquirer must separately support accepting a token it didn't provision. There's a deeper dependency worth naming: this design assumes MoneyHash operates as a <strong>token vault / Token Requestor</strong>, not a pure pass-through router. If MoneyHash routes to PSPs that each hold their own tokens, cross-provider portability mostly disappears and failover has to be redesigned around each PSP's credentials. So step one is confirming which model MoneyHash actually runs. <strong>mada</strong> in particular may not support cross-acquirer portability at all; if it doesn't, failover simply won't extend to mada cards.</div>
+    </div>
+    <div class="sol-step">
+      <span class="badge mine">My call</span>
+      <div class="body">One backup provider for v1. Declines are terminal (not retried cross-provider) to avoid fraud and dispute complexity without decline-code data yet. And if cross-provider portability isn't available for a given card or market, that card doesn't get outage-failover in v1: it degrades gracefully to single-provider with notify-on-failure, rather than to a broken experience.</div>
+    </div>
+    <div class="sol-step">
+      <span class="badge lim">Rejected</span>
+      <div class="body">
+        <strong>Retry the same provider after a delay.</strong> Doesn't solve an outage. If the provider is down, the retry fails too, and it adds ambiguous results to reconcile.<br>
+        <strong>Ask users to store a backup card upfront.</strong> Reintroduces exactly the friction Hawil asked us to remove, and a second card doesn't help when the problem is the provider, not the card.<br>
+        <strong>MoneyHash polling Hawil's balances.</strong> Unnecessary load and it moves rule ownership to the wrong side. Hawil owns the wallet, so Hawil owns the trigger.<br>
+        <strong>Storing raw PAN instead of a network token.</strong> Heavier PCI scope, no scheme-level benefits (auto-updated credentials, better auth rates), and no portability advantage.
+      </div>
+    </div>
+  </div>
+
+  <h2>3 · Failover logic</h2>
+  <p>The simple two-branch logic (outage → backup, decline → stop) misses the hardest real case: <strong>timeout / unknown status</strong>, no response from the primary before the window closes. Failing over blindly there risks <strong>two successful charges on two rails</strong> for one event. Idempotency keys protect against duplicate <em>triggers</em>, not this.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 680 540" role="img" aria-label="Auto top-up failover flow with labeled conditions">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#8793ad" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+        <style>
+          .cndg rect{fill:#fff;stroke:#D7DEEA;stroke-width:.8}
+          .cndg text{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;fill:#5B6B86}
+        </style>
+      </defs>
+
+      <!-- trigger -->
+      <rect x="250" y="26" width="180" height="46" rx="10" fill="#F1EFE8" stroke="#B4B2A9" stroke-width=".8"/>
+      <text class="dt" x="340" y="53" text-anchor="middle">Top-up triggered</text>
+      <line x1="340" y1="72" x2="340" y2="112" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
+      <g class="cndg"><rect x="284" y="82" width="112" height="20" rx="10"/><text x="340" y="95" text-anchor="middle">balance &lt; threshold</text></g>
+
+      <!-- primary charge -->
+      <rect x="205" y="112" width="270" height="56" rx="10" fill="#E6F1FB" stroke="#378ADD" stroke-width=".8"/>
+      <text class="dt" x="340" y="134" text-anchor="middle" fill="#0C447C">Charge primary provider</text>
+      <text class="dts" x="340" y="154" text-anchor="middle" fill="#185FA5">MIT · stored network token</text>
+
+      <!-- branch routes -->
+      <path d="M340,168 L340,196 L110,196 L110,236" fill="none" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
+      <path d="M340,168 L340,196 L270,196 L270,236" fill="none" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
+      <path d="M340,168 L340,196 L505,196 L505,236" fill="none" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
+      <g class="cndg"><rect x="72" y="206" width="76" height="20" rx="10"/><text x="110" y="219" text-anchor="middle">if approved</text></g>
+      <g class="cndg"><rect x="234" y="206" width="72" height="20" rx="10"/><text x="270" y="219" text-anchor="middle">if declined</text></g>
+      <g class="cndg"><rect x="455" y="206" width="100" height="20" rx="10"/><text x="505" y="219" text-anchor="middle">if provider error</text></g>
+
+      <!-- outcome row -->
+      <rect x="40" y="236" width="140" height="44" rx="10" fill="#E1F5EE" stroke="#1D9E75" stroke-width=".8"/>
+      <text class="dt" x="110" y="262" text-anchor="middle" fill="#0F6E56">Success</text>
+      <rect x="200" y="236" width="140" height="44" rx="10" fill="#FCEBEB" stroke="#E24B4A" stroke-width=".8"/>
+      <text class="dt" x="270" y="262" text-anchor="middle" fill="#A32D2D">Card declined</text>
+      <rect x="380" y="236" width="250" height="56" rx="10" fill="#FAEEDA" stroke="#EF9F27" stroke-width=".8"/>
+      <text class="dt" x="505" y="258" text-anchor="middle" fill="#854F0B">Provider error</text>
+      <text class="dts" x="505" y="278" text-anchor="middle" fill="#BA7517">timeout or 5xx</text>
+
+      <!-- to bottom row -->
+      <line x1="110" y1="280" x2="110" y2="332" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
+      <line x1="270" y1="280" x2="270" y2="332" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
+      <line x1="505" y1="292" x2="505" y2="332" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
+      <g class="cndg"><rect x="240" y="296" width="60" height="20" rx="10"/><text x="270" y="309" text-anchor="middle">no retry</text></g>
+      <g class="cndg"><rect x="475" y="302" width="60" height="20" rx="10"/><text x="505" y="315" text-anchor="middle">fail over</text></g>
+
+      <!-- bottom row -->
+      <rect x="40" y="332" width="140" height="44" rx="10" fill="#E1F5EE" stroke="#1D9E75" stroke-width=".8"/>
+      <text class="dt" x="110" y="358" text-anchor="middle" fill="#0F6E56">Top-up done</text>
+      <rect x="200" y="332" width="140" height="44" rx="10" fill="#FCEBEB" stroke="#E24B4A" stroke-width=".8"/>
+      <text class="dt" x="270" y="358" text-anchor="middle" fill="#A32D2D">Notify Hawil</text>
+      <rect x="380" y="332" width="250" height="56" rx="10" fill="#FAEEDA" stroke="#EF9F27" stroke-width=".8"/>
+      <text class="dt" x="505" y="354" text-anchor="middle" fill="#854F0B">Retry via backup</text>
+      <text class="dts" x="505" y="374" text-anchor="middle" fill="#BA7517">same token · no OTP</text>
+
+      <!-- backup outcomes -->
+      <path d="M505,388 L505,414 L432,414 L432,452" fill="none" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
+      <path d="M505,388 L505,414 L578,414 L578,452" fill="none" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
+      <g class="cndg"><rect x="394" y="420" width="76" height="20" rx="10"/><text x="432" y="433" text-anchor="middle">if approved</text></g>
+      <g class="cndg"><rect x="548" y="420" width="60" height="20" rx="10"/><text x="578" y="433" text-anchor="middle">if fails</text></g>
+      <rect x="382" y="452" width="100" height="44" rx="10" fill="#E1F5EE" stroke="#1D9E75" stroke-width=".8"/>
+      <text class="dt" x="432" y="478" text-anchor="middle" fill="#0F6E56">Success</text>
+      <rect x="516" y="452" width="125" height="44" rx="10" fill="#FCEBEB" stroke="#E24B4A" stroke-width=".8"/>
+      <text class="dt" x="578" y="478" text-anchor="middle" fill="#A32D2D">Notify Hawil</text>
+    </svg>
+    <div class="caption">Overview flow. The full written logic below adds the timeout / unknown-status branch, the hardest case, deliberately kept off the overview diagram for clarity.</div>
+  </div>
+
+  <p>Full logic, including the timeout case the overview diagram simplifies:</p>
+  <div class="branches">
+    <div class="bhead">MIT charge → Primary Provider <span class="chip">4 outcomes</span></div>
+    <div class="brow">
+      <span class="cond"><span class="bdot ok"></span>Success</span>
+      <span class="arrow">→</span>
+      <span class="out"><strong>Done.</strong></span>
+    </div>
+    <div class="brow">
+      <span class="cond"><span class="bdot bad"></span>Card declined</span>
+      <span class="arrow">→</span>
+      <span class="out">Notify Hawil. <strong>No retry</strong>, a decline is a card problem, not a provider one.</span>
+    </div>
+    <div class="brow">
+      <span class="cond"><span class="bdot warn"></span>Clear provider error</span>
+      <span class="arrow">→</span>
+      <span class="out">Retry via Backup, <strong>same token, no re-auth</strong>. (5xx, connection refused.)</span>
+    </div>
+    <div class="brow hl">
+      <div class="toprow">
+        <span class="cond"><span class="bdot warn"></span>Timeout / no reply</span>
+        <span class="arrow">→</span>
+        <span class="out"><strong>Resolve the outcome before acting</strong>, never fail over blind.</span>
+        <span class="tag-hard">the hard case</span>
+      </div>
+      <div class="subtree">
+        <div class="subrow"><span class="sarr">└</span> Same-key retry, then status lookup <span class="sarr">→</span> <strong>confirmed failed</strong> <span class="sarr">→</span> retry via Backup</div>
+        <div class="subrow"><span class="sarr">└</span> <strong>Confirmed succeeded</strong> <span class="sarr">→</span> done, no backup charge</div>
+        <div class="subrow"><span class="sarr">└</span> Still <strong>unknown</strong> <span class="sarr">→</span> hold + flag for manual reconciliation <em style="color:var(--muted)">(do not auto-fire backup)</em></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flag"><strong>Two safeguards doing two different jobs:</strong> an <strong>idempotency key</strong> stops the <em>same request</em> from charging twice. It does <em>not</em> tell us whether Provider A actually captured after a timeout. That's what a <strong>status inquiry</strong> is for. Idempotency alone can't prevent a <code>Provider A (silently succeeded) → Provider B</code> double charge, because those are two charges on two different rails, not one repeated request. The status inquiry is the piece that closes that gap.</div>
+
+  <div class="card" style="border-top:3px solid var(--green)">
+    <p style="margin:0 0 9px"><strong>This follows established payments practice, not something I'm inventing:</strong></p>
+    <ul style="margin:0;padding-left:18px">
+      <li style="margin-bottom:7px"><strong>Same-key safe retry on timeout.</strong> Both Stripe and Adyen let you safely retry a timed-out call with the <em>same idempotency key</em>: if the platform already processed it, you get the original result back instead of a second charge. <a class="src-link" href="https://docs.adyen.com/development-resources/api-idempotency" target="_blank" rel="noopener">Adyen documents exactly this for timeouts</a>. So on our own primary attempt, the first move on a timeout is a same-key retry, and only if that can't resolve the outcome do we treat it as unknown.</li>
+      <li style="margin-bottom:7px"><strong>"Get by idempotency key" for the unknown case.</strong> For a genuinely ambiguous result, the right tool is to look the transaction up by its key on the provider side before acting, rather than firing the backup blind. That's the reconciliation step in the "still unknown" branch above.</li>
+      <li style="margin-bottom:7px"><strong>Idempotent webhook handling + ordering.</strong> Webhooks get redelivered and can arrive out of order (a "succeeded" before its "processing"). So the receiver must be idempotent too and key off the final state, not arrival order. <a class="src-link" href="https://docs.stripe.com/webhooks" target="_blank" rel="noopener">Stripe calls this out as a webhook best practice</a>, alongside signature verification.</li>
+      <li><strong>Circuit breaker on a failing provider.</strong> Once a provider is clearly down, stop sending it new charges for a cooldown window and route to the backup, rather than hammering it and generating more timeouts to reconcile. A standard resilience pattern, and it keeps the ambiguous-result volume low during an outage.</li>
+    </ul>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <tr><th>Decision</th><th>Call</th><th>Validate</th></tr>
+      <tr><td>Token ownership</td><td>MoneyHash-owned network token</td><td>Confirm platform capability, then per-scheme portability, especially mada</td></tr>
+      <tr><td>Timeout handling</td><td>Same-key retry first, then status inquiry, never blind failover</td><td>Define timeout / grace-period thresholds with engineering</td></tr>
+      <tr><td>Decline vs. outage</td><td>Only confirmed outages trigger failover</td><td>Revisit with decline-code data</td></tr>
+      <tr><td>Cascade depth</td><td>1 backup for v1</td><td>Expand with real outage data</td></tr>
+    </table>
+  </div>
+
+  <h2>4 · Scope (v1)</h2>
+  <div class="scope-cols">
+    <div class="scope-col in">
+      <div class="sh"><span class="si">✓</span> In scope</div>
+      <ul>
+        <li>CIT setup (card + 3DS consent)</li>
+        <li>MIT charge with correct standing-instruction tags</li>
+        <li>Status-check before failover to one backup provider</li>
+        <li>Transaction status inquiry / reconciliation (the piece that makes outage-safe failover possible without double charging)</li>
+        <li>Idempotency on both sides: request keys to prevent double charges, and idempotent webhook handling for redelivered or out-of-order events</li>
+        <li>Failure notification (push)</li>
+        <li>Rule pause / cancellation <em>(kept in on purpose: a feature that auto-charges a user's card needs a stop button from day one, that's a trust requirement, not a nice-to-have)</em></li>
+      </ul>
+    </div>
+    <div class="scope-col def">
+      <div class="sh"><span class="si">→</span> Deferred</div>
+      <ul>
+        <li>Cascades beyond 2 providers <em>(one backup covers most outages; more adds complexity with no data to justify it yet)</em></li>
+        <li>mada support <em>(Hawil runs in AED/UAE, where Visa and Mastercard dominate; mada is Saudi Arabia's domestic scheme, so it matters when Hawil expands into KSA, not for a UAE-first v1. Deferred to that expansion, not dropped. Open risk if their base is more Saudi-heavy than assumed, so worth confirming.)</em></li>
+        <li>Decline-based cross-provider retry <em>(adds fraud and dispute risk; needs decline-code data first)</em></li>
+        <li>Auto-disable after repeated failures <em>(edge case, not core to proving the mechanism works)</em></li>
+      </ul>
+    </div>
+    <div class="scope-col met wide">
+      <div class="sh"><span class="si">%</span> How we measure success</div>
+      <ul>
+        <li>% of triggers completed with zero user action</li>
+        <li>Recovery rate <em>during confirmed provider-outage windows</em> specifically (the number that actually proves the outage requirement is met, not overall zero-action rate, which can look healthy while the hard case fails)</li>
+        <li>% of triggers recovered specifically via failover</li>
+        <li>Duplicate-charge rate <em>(the central risk of this feature, so we measure it directly, target: effectively zero)</em></li>
+        <li>False-failover rate <em>(times we failed over when the primary had actually succeeded)</em></li>
+        <li>Decline-rate trend over time</li>
+        <li>Rate of "unknown status" holds needing manual reconciliation</li>
+        <li>% of enrolled users who keep auto top-up active after 30 days <em>(the real signal: do users trust it enough to leave it on)</em></li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>5 · User story</h2>
+  <div class="story">
+    <div class="sec">
+      <span class="lbl2">Title</span>
+      <p class="title-line">Confirm-before-failover for auto top-up</p>
+    </div>
+    <div class="sec">
+      <span class="lbl2">Description</span>
+      <p class="desc">As Hawil's wallet system, I want the top-up to retry via a backup provider <em>only once an outage is confirmed</em>, so it completes without user action during a real outage and never double-charges on a timeout.</p>
+    </div>
+    <div class="sec">
+      <span class="lbl2">Acceptance criteria</span>
+      <ul>
+        <li><strong>Given</strong> an active rule with a tokenized card (CIT + 3DS complete)</li>
+        <li><strong>When</strong> the balance crosses the threshold and Hawil sends a trigger</li>
+        <li><strong>Then</strong> MoneyHash charges the primary provider with MIT tags</li>
+        <li>If <strong>declined</strong> → no retry, decline webhook to Hawil</li>
+        <li>If a <strong>clear provider error</strong> → retry via backup, same token, no re-auth</li>
+        <li>If <strong>timeout / no response</strong> → resolve the outcome first: same-key retry, then a status lookup. Only retry via backup once failure is confirmed. If the state is still unknown past a grace period, hold and flag for reconciliation rather than firing the backup</li>
+        <li>An <strong>idempotency key</strong> per trigger prevents duplicate triggers creating duplicate charges</li>
+        <li>On <strong>success or full failure</strong> → webhook to Hawil</li>
+      </ul>
+    </div>
+    <div class="sec">
+      <span class="lbl2">Affected areas</span>
+      <div class="affected">
+        <span class="achip">Tokenization / network token</span>
+        <span class="achip">Provider routing &amp; failover</span>
+        <span class="achip">Webhook notifications</span>
+        <span class="achip">Idempotency layer</span>
+        <span class="achip">Reconciliation / ops dashboard</span>
+        <span class="achip">Hawil wallet integration</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>6 · Merchant note</h2>
+  <div class="merchant">
+    <div class="mbody">
+    <h4>Auto top-up: how it'll work</h4>
+    <p>Once a user sets their rule (for example, "top up 200 AED whenever my balance drops below 50 AED"), we take care of the rest automatically. There's no app to open, no one-time code sent by SMS, and no re-typing card details.</p>
+    <p><span class="lbl">On your side:</span> the only thing your app does is let us know the moment a user's balance drops below their limit. You send us that one message, and we handle everything after it.</p>
+    <p><span class="lbl">What users experience:</span> nothing at all. The top-up happens quietly in the background. We save the card in a way that lets it work with more than one payment company, not just a single one. So if the main payment company we're using stops working for a while (like the two times that happened to you last quarter), we simply complete the top-up through a backup payment company, using the same saved card. In almost all cases the user won't need to do anything or even know it happened. (Occasionally a bank may ask the user to confirm a payment for security; that's the bank's call, not something we can switch off, but for this kind of automatic reload it's rare.)</p>
+    <p style="margin-bottom:0"><span class="lbl">What to keep in mind:</span> this backup only helps when the <em>payment company</em> has a problem, not when the <em>card itself</em> does. If a card has expired or doesn't have enough money on it, no company can push the payment through. In that case we let you know, so you can tell the user, instead of quietly retrying. We'd rather show a real problem than hide it. As for which cards this covers, that depends on the payment methods live on your account, so rather than guess, here's <a class="src-link" href="https://moneyhash.io/Integrations" target="_blank" rel="noopener">the full list of payment methods we support</a>. Tell us which ones matter most to your users and we'll confirm they're ready for auto top-up.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PART 3 ================= -->
+<section class="panel" id="p3">
+  <span class="eyebrow">Part 3 · Technical Troubleshooting</span>
+  <h1>Souq&amp;Co: success screen, no money</h1>
+  <p class="lead">Shoppers see success and get their order, but Finance says the money was never collected. There's more than one root cause.</p>
+  <div class="approach-note">
+    <span class="an-ic">→</span>
+    <p><strong>How I approached this:</strong> I reasoned only from the artifacts in front of me, and was deliberate about separating what the logs <em>prove</em> from what they don't, rather than inventing a tidy story to fill the gap.</p>
+  </div>
+
+  <h2>1 · Diagnose</h2>
+  <p>Working through what the evidence directly shows, in order:</p>
+  <div class="tablewrap">
+    <table>
+      <tr><th style="width:150px">Observation</th><th>What it tells us</th></tr>
+      <tr><td><strong>A, the request</strong></td><td><code>"operation": "authorize"</code>, not <code>authorize_and_capture</code>, and no separate capture call anywhere in the notes.</td></tr>
+      <tr><td><strong>B, the webhook</strong></td><td>Carries <code>"status": "AUTHORIZED"</code>. Never <code>CAPTURED</code>. Directly stated, not inferred: the only status Souq&amp;Co is ever told about is a hold.</td></tr>
+      <tr><td><strong>C, their notes</strong></td><td>They mark orders <code>PAID</code> and release goods on the <code>?status=success</code> redirect param, a client-side signal that passes through the shopper's browser and can arrive out of order or before backend processing completes.</td></tr>
+    </table>
+  </div>
+  <h3>What "authorize" actually means</h3>
+  <p>Authorize only places a hold and confirms the issuer will allow the charge, it does <strong>not</strong> move money. Collecting funds needs an explicit <strong>capture</strong> step. Without one, the hold expires after a scheme-defined window and funds release back to the cardholder, the merchant is never paid.</p>
+
+  <div class="card" style="border-top:3px solid var(--blue)">
+    <h3 style="margin-top:0">Root causes (both directly evidenced)</h3>
+    <ol style="margin-bottom:0">
+      <li><strong>No capture step exists.</strong> <code>operation: authorize</code> in the request, and an <code>AUTHORIZED</code>-only webhook, both point to the same gap.</li>
+      <li><strong>Fulfillment is (at least partly) triggered by the redirect</strong>, a client-side signal, rather than exclusively by a confirmed server-side event.</li>
+    </ol>
+  </div>
+  <div class="flag"><strong>On the "why only some orders" question, to be precise:</strong> the evidence proves the <em>structural defect</em> that makes this failure possible. It does <em>not</em> establish why the money goes uncollected on some orders and not others. That needs order-level data from Souq&amp;Co showing which orders had capture skipped, and whether any other process partially reconciles this. I'd ask for that data rather than guess a mechanism.</div>
+
+  <h2>2 · The correct flow, end-to-end</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 680 250" role="img" aria-label="Correct payment flow from checkout to fulfillment">
+      <defs>
+        <marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#8793ad" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+        <style>
+          .cndg2 rect{fill:#fff;stroke:#EAD9B8;stroke-width:.8}
+          .cndg2 text{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;fill:#946A16}
+        </style>
+      </defs>
+      <!-- top row: main flow -->
+      <rect x="20" y="40" width="118" height="50" rx="10" fill="#F1EFE8" stroke="#B4B2A9" stroke-width=".8"/>
+      <text class="dt" x="79" y="70" text-anchor="middle">Checkout</text>
+      <rect x="168" y="40" width="118" height="50" rx="10" fill="#E6F1FB" stroke="#378ADD" stroke-width=".8"/>
+      <text class="dt" x="227" y="62" text-anchor="middle" fill="#0C447C">Authorize</text>
+      <text class="dts" x="227" y="79" text-anchor="middle" fill="#185FA5">funds held</text>
+      <rect x="316" y="40" width="118" height="50" rx="10" fill="#EDE9FB" stroke="#7F77DD" stroke-width=".8"/>
+      <text class="dt" x="375" y="62" text-anchor="middle" fill="#3C3489">Capture</text>
+      <text class="dts" x="375" y="79" text-anchor="middle" fill="#534AB7">missing today</text>
+      <rect x="464" y="40" width="120" height="50" rx="10" fill="#E1F5EE" stroke="#1D9E75" stroke-width=".8"/>
+      <text class="dt" x="524" y="62" text-anchor="middle" fill="#0F6E56">CAPTURED</text>
+      <text class="dts" x="524" y="79" text-anchor="middle" fill="#0F6E56">webhook</text>
+      <line x1="138" y1="65" x2="164" y2="65" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <line x1="286" y1="65" x2="312" y2="65" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <line x1="434" y1="65" x2="460" y2="65" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <!-- fulfillment -->
+      <path d="M524,90 L524,120 L524,146" fill="none" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <rect x="452" y="146" width="144" height="46" rx="10" fill="#E1F5EE" stroke="#1D9E75" stroke-width=".8"/>
+      <text class="dt" x="524" y="173" text-anchor="middle" fill="#0F6E56">Fulfill order ✓</text>
+      <!-- redirect = ux only -->
+      <rect x="168" y="146" width="118" height="46" rx="10" fill="#FAEEDA" stroke="#EF9F27" stroke-width=".8" stroke-dasharray="4 3"/>
+      <text class="dt" x="227" y="168" text-anchor="middle" fill="#854F0B">Redirect back</text>
+      <text class="dts" x="227" y="184" text-anchor="middle" fill="#BA7517">UX only, not fulfill</text>
+      <path d="M227,90 L227,120 L227,142" fill="none" stroke="#EF9F27" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar2)"/>
+      <g class="cndg2"><rect x="182" y="106" width="90" height="20" rx="10"/><text x="227" y="119" text-anchor="middle">"thank you" page</text></g>
+    </svg>
+    <div class="caption">The redirect controls what the shopper <em>sees</em>. The captured webhook controls what the business <em>does</em>. Those two must never be the same trigger.</div>
+  </div>
+  <div class="flag"><strong>Two precision points:</strong> <code>CAPTURED</code> ≠ <code>SETTLED</code>. Capture is the merchant's instruction to collect and is the right fulfillment trigger; settlement is the backend clearing process that happens later, not something a merchant waits on to ship. And the webhook isn't the <em>only</em> trustworthy signal, a direct <strong>API status query</strong> on the intent is an equally valid server-side source of truth. What should never drive fulfillment is anything the merchant's backend didn't verify server-side, that's the redirect's disqualifying feature.</div>
+  <div class="note"><strong>On auto-capture:</strong> <code>authorize_and_capture</code> is right <em>if Souq&amp;Co ships at order time.</em> If fulfillment is delayed (pre-orders, backorders, split shipments), best practice is the opposite, authorize at checkout, fire the explicit capture from the <em>shipping</em> event, since some networks discourage capturing before goods are provided. A question to ask them, not assume.</div>
+
+  <h2>3 · Merchant reply</h2>
+  <div class="merchant">
+    <div class="mhead">
+      <div class="mrow"><b>From</b> Ahmed Mostafa, MoneyHash</div>
+      <div class="mrow"><b>To</b> Souq&amp;Co, Integrations &amp; Finance</div>
+      <div class="mrow"><b>Subject</b> Re: payments showing success but not collected</div>
+    </div>
+    <div class="mbody">
+    <p>Hi team,</p>
+    <p>Thanks for flagging this, I can imagine it wasn't a comfortable thing for Finance to spot. The good news: we know exactly what's happening, it's a small wiring issue rather than anything wrong with your payments, and we'll fix it together.</p>
+    <p><span class="lbl">What's wrong:</span> two small gaps in the checkout. First, the payment is only <em>reserved</em> on the card (a temporary hold) and never actually <em>collected</em>, so after a few days the hold expires and the money slips back to the customer. Second, orders are released the moment the shopper hits the "thank you" page, but that page isn't proof of payment, the reliable confirmation is a message our system sends straight to your server.</p>
+    <p><span class="lbl">What to change:</span> collect the money at the right moment (right away if you ship immediately, or when you ship if it's later), and only release an order once you've had our confirmed <code>CAPTURED</code> message, not the browser page. My team will walk your engineers through both steps.</p>
+    <p style="margin-bottom:0"><span class="lbl">The orders already affected:</span> please don't worry about digging through these, that's on us. We'll reconcile the last three weeks and sort them into groups: ones we can still collect straight away, ones where the hold expired and the money needs re-collecting from the customer, and any where the payment state is unclear, which we'll confirm before doing anything so we never accidentally charge twice. I'll get that to you today.</p>
+    <p>Please don't hesitate to come back with any question, however small, I'd much rather you ask than sit with any doubt. Happy to jump on a quick call, or just reply here.</p>
+    <div class="sig">
+      <div class="nm">Ahmed Mostafa</div>
+      <div class="rl">Product Manager, MoneyHash</div>
+    </div>
+    </div>
+  </div>
+
+  <h2>4 · Prevent the next one</h2>
+  <div class="card">
+    <p style="margin:0 0 10px"><strong>The strongest fix makes the mistake impossible, not just detectable.</strong> The root cause is that the redirect <em>looks</em> like a payment result, so merchants trust it. The platform change I'd push for is at the API level, and it mirrors how the major platforms already handle this: the redirect should <em>not</em> carry a usable <code>?status=success</code>. Instead it carries only a <strong>reference/session ID</strong>, and the merchant has to take that ID and ask our server for the real payment state before doing anything. This is exactly Stripe's model, they return a session ID on the redirect and tell merchants to <a class="src-link" href="https://docs.stripe.com/payments/checkout/custom-success-page" target="_blank" rel="noopener">verify the payment server-side and never rely on the redirect for fulfillment</a>. If the redirect can't tell you a payment succeeded, no merchant can accidentally build on it, which removes this class of bug at the source instead of catching it after the fact.</p>
+    <p style="margin:0 0 10px"><span class="lbl" style="font-weight:700;color:var(--ink)">Paired with:</span> webhook <strong>signature verification</strong> so a merchant can trust a confirmation genuinely came from us and isn't spoofed, which is standard practice on Stripe's webhooks too.</p>
+    <p style="margin:0"><span class="lbl" style="font-weight:700;color:var(--ink)">Supporting layers:</span> a sandbox certification check at onboarding that confirms fulfillment keys off the confirmed payment state before go-live (this bug surfaced only three weeks in, exactly what a pre-launch check would catch), and a dashboard alert for any <code>AUTHORIZED</code> intent left uncaptured near its expiry window, to protect merchants who onboarded earlier.</p>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="panel active" id="about">
+  <span class="eyebrow">How I worked</span>
+  <h1>My Approach</h1>
+
+  <div class="profile">
+    <div class="pl">
+      <div class="nm">AHMED MOSTAFA</div>
+      <div class="ttl">Product Owner · PSPO™</div>
+      <div class="contact">
+        <a href="tel:+201022127407"><span class="ci">📞</span> +20 102 212 7407</a>
+        <a href="mailto:ahmed.mostafa.officia@gmail.com"><span class="ci">✉</span> ahmed.mostafa.officia@gmail.com</a>
+        <a href="https://linkedin.com/in/eng-ahmedmostafa" target="_blank" rel="noopener"><span class="ci">in</span> linkedin.com/in/eng-ahmedmostafa</a>
+      </div>
+    </div>
+  </div>
+
+  <p class="lead">The brief asks to see how I actually work, not just the answer. So here's how I moved from a cold task to this submission, and exactly where AI helped.</p>
+
+  <div class="approach-note">
+    <span class="an-ic">i</span>
+    <p><strong>My starting principle:</strong> the brief says every line has to be mine to defend in the live review, so that's how I worked. I used AI to move faster on two things only, finding primary sources and challenging my own claims, while every decision, trade-off, and recommendation here is mine and defensible without the tool in the room. The steps below are how I actually reasoned through it.</p>
+  </div>
+
+  <h2>How I moved through it</h2>
+  <div class="steps-tl">
+    <div class="tl-item">
+      <h4>1. Read the whole brief first, then framed the real ask</h4>
+      <p>Before writing anything, I read all three parts to understand what the assessment actually rewards: structured thinking, honest assumptions, and real payments discovery over polish. I decided early that being clear and defensible mattered more than writing a lot.</p>
+    </div>
+    <div class="tl-item">
+      <h4>2. Part 1: opinion first, then I pressure-tested every claim</h4>
+      <p>I wrote a sharp value prop and a marketplace ICP, then went back and challenged each claim myself. Is the "2 to 3x failure rates" number mine or MoneyHash's? Why enterprise and not smaller merchants? Why regional and not global? I split what I could source from what was my own judgment, and labelled it that way, so I'm never caught defending a guess as if it were a fact.</p>
+    </div>
+    <div class="tl-item">
+      <h4>3. Part 2: found the industry pattern before inventing one</h4>
+      <p>The brief pointed toward existing rails, so I looked into how the industry already handles charging a saved card without the customer present. That took me to the MIT / Standing Instruction model and network tokenization. The turning point was seeing that the outage requirement isn't solved by tokens alone. The genuinely hard case is a timeout, where you don't know if the first charge went through, and failing over blindly can charge the user twice. That one insight shaped my whole v1.</p>
+    </div>
+    <div class="tl-item">
+      <h4>4. Part 3: reasoned only from the evidence in front of me</h4>
+      <p>I traced the two root causes straight from the artifacts: <code>operation: authorize</code> with no capture step, and their own note that they release orders on the browser redirect. The brief hints there's more than one problem, and the complaint says <em>some</em> orders slip through, so the tempting move is to invent a reason for "why only some." I didn't. The logs prove the defect is there, but they don't explain why it hits some orders and not others, so I said what I'd need to check instead of guessing.</p>
+    </div>
+    <div class="tl-item">
+      <h4>5. Wrote for the reader, not for myself</h4>
+      <p>Two of the tasks are really about communication, so I wrote them for real people. The merchant note is in plain words a non-payments person can follow, and the Souq&amp;Co reply is an email I'd actually send: clear, warm, and never talking down to a customer who made an honest mistake.</p>
+    </div>
+  </div>
+
+  <h2>How I kept the thinking honest</h2>
+  <div class="ai-grid">
+    <div class="ai-card did">
+      <h4>✓ What I did throughout</h4>
+      <ul>
+        <li>Separated facts, assumptions, and open questions, and labelled them as such</li>
+        <li>Researched established payment patterns before inventing a solution</li>
+        <li>Pressure-tested the edge cases (timeout, ambiguous outcomes, expired holds)</li>
+        <li>Kept sourced facts and my own product judgment clearly apart</li>
+      </ul>
+    </div>
+    <div class="ai-card didnt">
+      <h4>✕ Where the line sits</h4>
+      <ul>
+        <li>Every recommendation, scope decision, and trade-off is mine</li>
+        <li>The core call in Part 2 (check before failover) and the Part 3 diagnosis are mine</li>
+        <li>AI accelerated source-finding and challenged my claims; it didn't make the decisions</li>
+        <li>I can defend every line in this submission without the tool in the room</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span><strong>Ahmed Mostafa</strong></span>
+  <span>MoneyHash · Product Manager Case Assessment</span>
+</footer>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll('#tabs button'));
+  const panels = Array.from(document.querySelectorAll('.panel'));
+
+  function show(id, push){
+    if(!panels.some(p => p.id === id)) return;
+    tabs.forEach(b => {
+      const on = b.dataset.tab === id;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+      b.tabIndex = on ? 0 : -1;
+    });
+    panels.forEach(p => p.classList.toggle('active', p.id === id));
+    if(push && history.replaceState) history.replaceState(null, '', '#' + id);
+  }
+
+  tabs.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      show(btn.dataset.tab, true);
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+    // arrow-key navigation between tabs
+    btn.addEventListener('keydown', e => {
+      if(e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      next.focus();
+      show(next.dataset.tab, true);
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+
+  // open directly on a shared section, e.g. ...#p3
+  const start = location.hash.replace('#','');
+  if(start) show(start, false);
+  window.addEventListener('hashchange', () => show(location.hash.replace('#',''), false));
+</script>
+</body>
+</html>

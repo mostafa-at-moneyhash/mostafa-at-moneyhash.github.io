@@ -44,7 +44,7 @@
   a:hover{text-decoration:none;border-bottom-color:var(--blue)}
   a.src-link{font-weight:600;white-space:nowrap}
   a.src-link::after{content:" ↗";font-size:.85em;opacity:.7}
-
+ 
   /* ---------- header ---------- */
   header{
     position:sticky;top:14px;z-index:50;
@@ -62,7 +62,7 @@
   .logo-img{height:46px;width:auto;display:block;image-rendering:auto}
   .barmeta{margin-left:auto;font-size:13px;color:var(--muted-d);text-align:right;line-height:1.35}
   .barmeta strong{color:#fff;font-weight:600}
-
+ 
   /* ---------- tabs ---------- */
   nav.tabs{
     display:flex;justify-content:center;gap:4px;padding:0 16px 4px;
@@ -78,13 +78,13 @@
   }
   nav.tabs button:hover{color:#fff}
   nav.tabs button.active{color:var(--peach);border-bottom-color:var(--peach)}
-
+ 
   /* ---------- layout ---------- */
   main{max-width:var(--maxw);margin:0 auto;padding:38px 24px 90px}
   .panel{display:none;animation:fade .35s ease}
   .panel.active{display:block}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
+ 
   .eyebrow{
     display:inline-block;font-size:12px;font-weight:700;letter-spacing:.12em;
     text-transform:uppercase;color:var(--blue);margin-bottom:10px;
@@ -102,7 +102,7 @@
     font-size:13.5px;background:var(--blue-soft);color:#1B4DA8;
     padding:1.5px 6px;border-radius:5px;
   }
-
+ 
   /* hero pitch block */
   .pitch{
     background:var(--navy);color:#fff;border-radius:var(--radius);
@@ -112,7 +112,7 @@
   .pitch h2{color:#fff;font-size:28px;margin:0 0 12px;padding:0;letter-spacing:-.02em;line-height:1.2}
   .pitch h2 em{color:var(--peach);font-style:normal}
   .pitch p{color:var(--muted-d);margin:0;font-size:16px}
-
+ 
   /* cards / callouts */
   .card{
     background:var(--paper);border:1px solid var(--line);
@@ -123,7 +123,7 @@
   .pp{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 18px 16px;border-top:3px solid var(--blue)}
   .pp h4{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--ink)}
   .pp p{font-size:14px;margin:0;color:var(--muted)}
-
+ 
   .note{
     border-left:3px solid var(--blue);background:var(--blue-soft);
     border-radius:0 10px 10px 0;padding:13px 16px;margin:14px 0;
@@ -135,7 +135,7 @@
     border-radius:0 10px 10px 0;padding:13px 16px;margin:14px 0;font-size:14px;color:#6b4a10;
   }
   .flag strong{color:#6b4a10}
-
+ 
   /* tables */
   .tablewrap{overflow-x:auto;margin:14px 0;border-radius:12px;border:1px solid var(--line)}
   table{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--paper);overflow:hidden}
@@ -146,14 +146,14 @@
   td strong{color:var(--ink)}
   /* first-column emphasis for label tables */
   table td:first-child{font-weight:600;color:var(--ink)}
-
+ 
   .panel > h2{color:var(--ink)}
   .panel > h2::before{content:"";display:inline-block;width:16px;height:2.5px;background:var(--peach-2);vertical-align:middle;margin-right:10px;border-radius:2px;transform:translateY(-4px)}
   .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px;letter-spacing:.02em;vertical-align:middle}
   .tag.src{background:var(--blue-soft);color:#1B4DA8}
   .tag.mine{background:#EDE9FB;color:#4b3fb0}
   .tag.fix{background:#E1F5EE;color:#0F6E56}
-
+ 
   /* ---- enhanced tables ---- */
   /* two-column contrast split (changes vs stays same) */
   .split{display:grid;gap:14px;margin:18px 0}
@@ -170,7 +170,7 @@
   .split .col ul{margin:0;padding-left:18px}
   .split .col li{font-size:14px;margin-bottom:8px;color:var(--ink-2)}
   .split .col li:last-child{margin-bottom:0}
-
+ 
   /* problem table with difficulty + build columns */
   .tablewrap:has(table.rich){border:none}
   table.rich{border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px}
@@ -188,7 +188,7 @@
   .diff .dot.on{background:var(--blue)}
   .diff .dot.hi{background:var(--red)}
   .buildcell{color:var(--ink-2)}
-
+ 
   /* ---- user story block ---- */
   .story{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--paper);margin:16px 0}
   .story .sec{padding:16px 20px;border-bottom:1px solid var(--line)}
@@ -202,7 +202,7 @@
   .story li:last-child{margin-bottom:0}
   .story .affected{display:flex;flex-wrap:wrap;gap:8px}
   .story .achip{font-size:12.5px;font-weight:600;background:#EAF0FB;color:#1B4DA8;padding:5px 12px;border-radius:20px;border:1px solid #D3E0F5}
-
+ 
   /* ---- approach note (intro at top of each part) ---- */
   .approach-note{
     display:flex;gap:12px;align-items:flex-start;
@@ -213,7 +213,7 @@
   .approach-note .an-ic{flex:none;width:26px;height:26px;border-radius:7px;background:#D3E0F5;color:#1B4DA8;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;margin-top:1px}
   .approach-note p{margin:0;font-size:13.5px;color:#274a7d}
   .approach-note strong{color:#173a72}
-
+ 
   /* ---- my-approach tab ---- */
   .steps-tl{position:relative;margin:18px 0 6px;padding-left:34px}
   .steps-tl::before{content:"";position:absolute;left:10px;top:8px;bottom:8px;width:2px;background:var(--line);transform:translateX(-50%)}
@@ -235,7 +235,7 @@
   .ai-card li:last-child{margin-bottom:0}
   .princ{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0}
   .princ span{font-size:13px;font-weight:600;background:var(--navy);color:#fff;padding:6px 14px;border-radius:20px}
-
+ 
   /* ---- scope columns ---- */
   .scope-cols{display:grid;gap:12px;margin:16px 0}
   @media(min-width:720px){.scope-cols{grid-template-columns:1fr 1fr}}
@@ -256,14 +256,14 @@
   .scope-col.met li::before{background:var(--blue)}
   .scope-col li em{color:var(--muted);font-style:normal;font-size:13px}
   .scope-col.wide{grid-column:1/-1}
-
+ 
   /* ---- problem breakdown grid ---- */
   .prob-grid{display:grid;gap:10px;margin:14px 0}
   @media(min-width:640px){.prob-grid{grid-template-columns:1fr 1fr}}
   .prob-cell{display:flex;gap:11px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
   .prob-cell .n{flex:none;width:24px;height:24px;border-radius:7px;background:var(--navy);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
   .prob-cell span.t{font-size:14px;color:var(--ink);font-weight:600;line-height:1.35;padding-top:2px}
-
+ 
   /* ---- solution flow steps ---- */
   .sol-flow{margin:16px 0}
   .sol-step{display:flex;gap:13px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line)}
@@ -275,7 +275,7 @@
   .sol-step .badge.mine{background:#EDE9FB;color:#4b3fb0}
   .sol-step .body{font-size:14px;color:var(--ink-2);line-height:1.55}
   .sol-step .body strong{color:var(--ink)}
-
+ 
   /* ---- profile / contact header ---- */
   .profile{
     display:flex;flex-wrap:wrap;align-items:center;gap:18px;
@@ -289,7 +289,7 @@
   .profile .contact a,.profile .contact span{color:var(--muted-d);border:none;display:inline-flex;align-items:center;gap:6px}
   .profile .contact a:hover{color:#fff}
   .profile .contact .ci{opacity:.7}
-
+ 
   /* ---- outcome branch visual ---- */
   .branches{margin:16px 0;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--paper)}
   .branches .bhead{background:var(--navy);color:#fff;font-weight:650;font-size:13.5px;padding:12px 18px;display:flex;align-items:center;gap:10px}
@@ -313,7 +313,7 @@
   .subrow{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-2)}
   .subrow .sarr{color:#c79a4e}
   .subrow strong{color:var(--ink)}
-
+ 
   /* pre / code flow */
   pre{
     background:var(--ink);color:#D7DEEE;border-radius:12px;
@@ -324,12 +324,12 @@
   pre .c-warn{color:#F0B968}
   pre .c-bad{color:#F2938A}
   pre .c-dim{color:#8793Ad}
-
+ 
   /* diagram frame */
   .diagram{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px 16px;margin:18px 0}
   .diagram svg{width:100%;height:auto;display:block}
   .caption{font-size:13px;color:var(--muted);text-align:center;margin-top:8px;padding:0 12px}
-
+ 
   .merchant{
     background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
     margin:16px 0;overflow:hidden;
@@ -344,9 +344,9 @@
   .merchant .sig{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
   .merchant .sig .nm{font-weight:700;color:var(--ink);font-size:14.5px}
   .merchant .sig .rl{color:var(--muted);font-size:13px}
-
+ 
   .divider{height:1px;background:var(--line);margin:30px 0}
-
+ 
   /* about placeholder */
   .placeholder{
     border:2px dashed var(--line);border-radius:var(--radius);
@@ -354,15 +354,15 @@
   }
   .placeholder .big{font-size:42px;margin-bottom:12px;color:var(--peach-2)}
   .placeholder h3{color:var(--ink);margin-bottom:6px}
-
+ 
   footer{max-width:var(--maxw);margin:0 auto;padding:26px 24px 40px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
   footer strong{color:var(--ink);font-weight:700}
-
+ 
   /* svg diagram shared text styles */
   .dt{font-family:var(--sans);font-size:13px;font-weight:600;fill:var(--ink)}
   .dts{font-family:var(--sans);font-size:11.5px;font-weight:500;fill:var(--muted)}
   .dlbl{font-family:var(--sans);font-size:11px;font-weight:600;fill:var(--muted)}
-
+ 
   @media(max-width:640px){
     h1{font-size:27px}.lead{font-size:16px}
     .pitch{padding:24px}.pitch h2{font-size:22px}
@@ -375,7 +375,7 @@
     .brow.hl .tag-hard{margin-left:0}
     nav.tabs{justify-content:flex-start}
   }
-
+ 
   @media print{
     /* Evaluators often print or save to PDF, so show every part, not just the active tab */
     header{position:static;box-shadow:none;margin:0 0 16px;border-radius:0}
@@ -393,23 +393,23 @@
 </style>
 </head>
 <body>
-
+ 
 <header>
   <div class="bar">
     <img class="logo-img" src="data:image/png;base64,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" alt="MoneyHash">
   </div>
   <nav class="tabs" id="tabs">
-    <button class="active" data-tab="about">My Approach</button>
-    <button data-tab="p1">Part 1 · Positioning &amp; ICP</button>
+    <button class="active" data-tab="p1">Part 1 · Positioning &amp; ICP</button>
     <button data-tab="p2">Part 2 · Hawil Auto Top-Up</button>
     <button data-tab="p3">Part 3 · Troubleshooting</button>
+    <button data-tab="about">My Approach</button>
   </nav>
 </header>
-
+ 
 <main>
-
+ 
 <!-- ================= PART 1 ================= -->
-<section class="panel" id="p1">
+<section class="panel active" id="p1">
   <span class="eyebrow">Part 1</span>
   <h1>Positioning &amp; ICP</h1>
   <p class="lead">What MoneyHash is, who it's for, and what agent-initiated payments change from here.</p>
@@ -417,7 +417,7 @@
     <span class="an-ic">→</span>
     <p><strong>How I approached this:</strong> I wrote the pitch I'd actually give, then went back and marked which claims come from MoneyHash and which are my own read, so it's clear what I'm asserting and on what basis.</p>
   </div>
-
+ 
   <h2>1 · Value proposition</h2>
   <div class="pitch">
     <div class="kicker">The sharpest version</div>
@@ -431,7 +431,7 @@
     <div class="pp"><h4>Less operational drag</h4><p>One dashboard instead of five reconciliation spreadsheets. Engineers ship product instead of maintaining processor integrations.</p></div>
   </div>
   <div class="note"><strong>On the numbers:</strong> the 3× failure-rate figure is <strong>company-stated</strong> (<a class="src-link" href="https://moneyhash.io/blog/pre-a-funding" target="_blank" rel="noopener">source</a>, CEO Nader Abdelrazik), not independently verified. I'm citing it as MoneyHash's own positioning, not as neutral market data.</div>
-
+ 
   <h2>2 · Ideal customer profile: Marketplaces</h2>
   <div class="tablewrap">
     <table>
@@ -442,7 +442,7 @@
     </table>
   </div>
   <p>A concrete example: <strong>noon</strong>, multi-vendor across GCC and Egypt. Delivery marketplaces like <strong>Talabat</strong> have the same shape, thousands of restaurant payouts. Both are illustrative; neither is a confirmed MoneyHash customer.</p>
-
+ 
   <h3>Capabilities that matter most</h3>
   <ul>
     <li><strong>Smart routing &amp; retry:</strong> every recovered decline is direct GMV, and it compounds fast at volume.</li>
@@ -450,7 +450,7 @@
     <li><strong>Unified reconciliation:</strong> reconciling seller payouts by hand across providers doesn't scale past a few hundred sellers.</li>
     <li><strong>Local payment method coverage:</strong> buyers are price-sensitive, and local methods measurably lift conversion. (BNPL like Tabby and Tamara is increasingly standard in-region, though no hard adoption data is cited.)</li>
   </ul>
-
+ 
   <h3>Integrations that matter most</h3>
   <ul>
     <li><strong>Card schemes + 3DS:</strong> baseline; 3DS also shifts fraud liability to the issuer, which matters at scale.</li>
@@ -459,7 +459,7 @@
     <li><strong>Payout / disbursement rail:</strong> a standard PSP has no concept of holding funds and routing a slice to a separate, KYC'd seller. This is why Stripe Connect / Adyen for Platforms exist as their own category. <em>(Worth confirming whether MoneyHash provides split payouts natively or orchestrates them to a specialist provider; either way, it's the marketplace-specific need to design around.)</em></li>
   </ul>
   <div class="card"><strong>Not a fit:</strong> single-seller Salla/Zid storefronts, one merchant, one payout account, no split-payment need. The marketplace value only appears once you <em>are</em> the aggregator, not a shop on someone else's platform.</div>
-
+ 
   <h2>3 · The agentic frontier</h2>
   <p>When the buyer is software acting for a person, some things break and some hold. Sorting which is which is most of the work:</p>
   <div class="split">
@@ -480,7 +480,7 @@
       </ul>
     </div>
   </div>
-
+ 
   <h3>Hardest problems for an orchestrator</h3>
   <div class="tablewrap">
     <table class="rich">
@@ -504,7 +504,7 @@
   </div>
   <div class="note"><strong>My recommendation:</strong> settle liability for agent-initiated transactions in the merchant T&amp;Cs <em>before</em> the volume arrives. Who bears the loss, what evidence counts as valid delegated authorization, how chargeback timelines work when the "cardholder" is an agent. Retrofitting this after the first disputes is a weak position, and merchants will ask before they let us route agent payments at all.</div>
 </section>
-
+ 
 <!-- ================= PART 2 ================= -->
 <section class="panel" id="p2">
   <span class="eyebrow">Part 2 · Solution Discovery</span>
@@ -514,7 +514,7 @@
     <span class="an-ic">→</span>
     <p><strong>How I approached this:</strong> in payments the expensive failure isn't "money doesn't move," it's "money moves twice." So I looked up the established pattern first, then spent most of my time on the case that actually causes double charges: a provider timeout where you don't know whether the first charge landed. That case shaped the design.</p>
   </div>
-
+ 
   <h2>1 · Frame the problem</h2>
   <p>"Frictionless, every time, even during an outage" breaks into four sub-problems:</p>
   <div class="prob-grid">
@@ -533,7 +533,7 @@
     <li>Roughly how many top-ups a day do you expect, and in which markets? (This shapes how many backup providers are worth wiring up, and whether mada matters.)</li>
     <li>Any GCC regulatory limits on standing-instruction charges we should account for?</li>
   </ul>
-
+ 
   <h2>2 · Solution space</h2>
   <div class="sol-flow">
     <div class="sol-step">
@@ -562,10 +562,10 @@
       </div>
     </div>
   </div>
-
+ 
   <h2>3 · Failover logic</h2>
   <p>The obvious two-branch logic (outage → backup, decline → stop) misses the case that actually matters: <strong>timeout / unknown status</strong>, where the primary never answers before the window closes. Fail over blindly there and you risk <strong>two successful charges on two rails</strong> for one event. Idempotency keys protect against duplicate <em>triggers</em>, not this.</p>
-
+ 
   <div class="diagram">
     <svg viewBox="0 0 680 540" role="img" aria-label="Auto top-up failover flow with labeled conditions">
       <defs>
@@ -575,18 +575,18 @@
           .cndg text{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;fill:#5B6B86}
         </style>
       </defs>
-
+ 
       <!-- trigger -->
       <rect x="250" y="26" width="180" height="46" rx="10" fill="#F1EFE8" stroke="#B4B2A9" stroke-width=".8"/>
       <text class="dt" x="340" y="53" text-anchor="middle">Top-up triggered</text>
       <line x1="340" y1="72" x2="340" y2="112" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
       <g class="cndg"><rect x="284" y="82" width="112" height="20" rx="10"/><text x="340" y="95" text-anchor="middle">balance &lt; threshold</text></g>
-
+ 
       <!-- primary charge -->
       <rect x="205" y="112" width="270" height="56" rx="10" fill="#E6F1FB" stroke="#378ADD" stroke-width=".8"/>
       <text class="dt" x="340" y="134" text-anchor="middle" fill="#0C447C">Charge primary provider</text>
       <text class="dts" x="340" y="154" text-anchor="middle" fill="#185FA5">MIT · stored network token</text>
-
+ 
       <!-- branch routes -->
       <path d="M340,168 L340,196 L110,196 L110,236" fill="none" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
       <path d="M340,168 L340,196 L270,196 L270,236" fill="none" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
@@ -594,7 +594,7 @@
       <g class="cndg"><rect x="72" y="206" width="76" height="20" rx="10"/><text x="110" y="219" text-anchor="middle">if approved</text></g>
       <g class="cndg"><rect x="234" y="206" width="72" height="20" rx="10"/><text x="270" y="219" text-anchor="middle">if declined</text></g>
       <g class="cndg"><rect x="455" y="206" width="100" height="20" rx="10"/><text x="505" y="219" text-anchor="middle">if provider error</text></g>
-
+ 
       <!-- outcome row -->
       <rect x="40" y="236" width="140" height="44" rx="10" fill="#E1F5EE" stroke="#1D9E75" stroke-width=".8"/>
       <text class="dt" x="110" y="262" text-anchor="middle" fill="#0F6E56">Success</text>
@@ -603,14 +603,14 @@
       <rect x="380" y="236" width="250" height="56" rx="10" fill="#FAEEDA" stroke="#EF9F27" stroke-width=".8"/>
       <text class="dt" x="505" y="258" text-anchor="middle" fill="#854F0B">Provider error</text>
       <text class="dts" x="505" y="278" text-anchor="middle" fill="#BA7517">timeout or 5xx</text>
-
+ 
       <!-- to bottom row -->
       <line x1="110" y1="280" x2="110" y2="332" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
       <line x1="270" y1="280" x2="270" y2="332" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
       <line x1="505" y1="292" x2="505" y2="332" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
       <g class="cndg"><rect x="240" y="296" width="60" height="20" rx="10"/><text x="270" y="309" text-anchor="middle">no retry</text></g>
       <g class="cndg"><rect x="475" y="302" width="60" height="20" rx="10"/><text x="505" y="315" text-anchor="middle">fail over</text></g>
-
+ 
       <!-- bottom row -->
       <rect x="40" y="332" width="140" height="44" rx="10" fill="#E1F5EE" stroke="#1D9E75" stroke-width=".8"/>
       <text class="dt" x="110" y="358" text-anchor="middle" fill="#0F6E56">Top-up done</text>
@@ -619,7 +619,7 @@
       <rect x="380" y="332" width="250" height="56" rx="10" fill="#FAEEDA" stroke="#EF9F27" stroke-width=".8"/>
       <text class="dt" x="505" y="354" text-anchor="middle" fill="#854F0B">Retry via backup</text>
       <text class="dts" x="505" y="374" text-anchor="middle" fill="#BA7517">same token · no OTP</text>
-
+ 
       <!-- backup outcomes -->
       <path d="M505,388 L505,414 L432,414 L432,452" fill="none" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
       <path d="M505,388 L505,414 L578,414 L578,452" fill="none" stroke="#8793ad" stroke-width="1.5" marker-end="url(#ar)"/>
@@ -632,7 +632,7 @@
     </svg>
     <div class="caption">Overview flow. The full written logic below adds the timeout / unknown-status branch, the hardest case, deliberately kept off the overview diagram for clarity.</div>
   </div>
-
+ 
   <p>Full logic, including the timeout case the overview diagram simplifies:</p>
   <div class="branches">
     <div class="bhead">MIT charge → Primary Provider <span class="chip">4 outcomes</span></div>
@@ -665,9 +665,9 @@
       </div>
     </div>
   </div>
-
+ 
   <div class="flag"><strong>Two safeguards doing two different jobs:</strong> an <strong>idempotency key</strong> stops the <em>same request</em> from charging twice. It does <em>not</em> tell us whether Provider A actually captured after a timeout. That's what a <strong>status inquiry</strong> is for. Idempotency alone can't prevent a <code>Provider A (silently succeeded) → Provider B</code> double charge, because those are two charges on two different rails, not one repeated request. The status inquiry is the piece that closes that gap.</div>
-
+ 
   <div class="card" style="border-top:3px solid var(--green)">
     <p style="margin:0 0 9px"><strong>None of this is novel, it's standard practice:</strong></p>
     <ul style="margin:0;padding-left:18px">
@@ -677,7 +677,7 @@
       <li><strong>Circuit breaker on a failing provider.</strong> Once a provider is clearly down, stop sending it new charges for a cooldown window and route to the backup, rather than hammering it and generating more timeouts to reconcile. A standard resilience pattern, and it keeps the ambiguous-result volume low during an outage.</li>
     </ul>
   </div>
-
+ 
   <div class="tablewrap">
     <table>
       <tr><th>Decision</th><th>Call</th><th>Validate</th></tr>
@@ -687,7 +687,7 @@
       <tr><td>Cascade depth</td><td>1 backup for v1</td><td>Expand with real outage data</td></tr>
     </table>
   </div>
-
+ 
   <h2>4 · Scope (v1)</h2>
   <div class="scope-cols">
     <div class="scope-col in">
@@ -724,7 +724,7 @@
       </ul>
     </div>
   </div>
-
+ 
   <h2>5 · User story</h2>
   <div class="story">
     <div class="sec">
@@ -760,7 +760,7 @@
       </div>
     </div>
   </div>
-
+ 
   <h2>6 · Merchant note</h2>
   <div class="merchant">
     <div class="mbody">
@@ -773,7 +773,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- ================= PART 3 ================= -->
 <section class="panel" id="p3">
   <span class="eyebrow">Part 3 · Technical Troubleshooting</span>
@@ -783,7 +783,7 @@
     <span class="an-ic">→</span>
     <p><strong>How I approached this:</strong> I worked only from the artifacts given, and kept what the logs <em>prove</em> separate from what they don't, rather than filling the gap with a tidier story.</p>
   </div>
-
+ 
   <h2>1 · Diagnose</h2>
   <p>What the evidence directly shows:</p>
   <div class="tablewrap">
@@ -796,7 +796,7 @@
   </div>
   <h3>What "authorize" actually means</h3>
   <p>Authorize places a hold and confirms the issuer will allow the charge. It does <strong>not</strong> move money. Collecting funds needs an explicit <strong>capture</strong>. Without one, the hold expires after a scheme-defined window, the funds release back to the cardholder, and the merchant is never paid.</p>
-
+ 
   <div class="card" style="border-top:3px solid var(--blue)">
     <h3 style="margin-top:0">Root causes (both directly evidenced)</h3>
     <ol style="margin-bottom:0">
@@ -805,7 +805,7 @@
     </ol>
   </div>
   <div class="flag"><strong>On "why only some orders":</strong> the evidence proves the <em>structural defect</em> that makes this possible. It doesn't explain why the money goes uncollected on some orders and not others. That needs order-level data showing which orders had capture skipped, and whether something else partially reconciles them. I'd ask for that rather than guess at a mechanism.</div>
-
+ 
   <h2>2 · The correct flow, end-to-end</h2>
   <div class="diagram">
     <svg viewBox="0 0 680 250" role="img" aria-label="Correct payment flow from checkout to fulfillment">
@@ -846,7 +846,7 @@
   </div>
   <div class="flag"><strong>Two things worth being precise about:</strong> <code>CAPTURED</code> ≠ <code>SETTLED</code>. Capture is the merchant's instruction to collect and is the right fulfillment trigger; settlement is the backend clearing process that happens later, not something a merchant waits on to ship. And the webhook isn't the <em>only</em> trustworthy signal, a direct <strong>API status query</strong> on the intent is an equally valid server-side source of truth. What should never drive fulfillment is anything the merchant's backend didn't verify server-side, that's the redirect's disqualifying feature.</div>
   <div class="note"><strong>On auto-capture:</strong> <code>authorize_and_capture</code> is right <em>if Souq&amp;Co ships at order time.</em> If fulfillment is delayed (pre-orders, backorders, split shipments), it's the opposite: authorize at checkout and fire the capture from the <em>shipping</em> event, since some networks discourage capturing before goods are provided. Worth asking them rather than assuming.</div>
-
+ 
   <h2>3 · Merchant reply</h2>
   <div class="merchant">
     <div class="mhead">
@@ -867,7 +867,7 @@
     </div>
     </div>
   </div>
-
+ 
   <h2>4 · Prevent the next one</h2>
   <div class="card">
     <p style="margin:0 0 10px"><strong>The fix I'd push for makes the mistake impossible rather than just detectable.</strong> The root cause is that the redirect <em>looks</em> like a payment result, so merchants trust it. So take that away at the API level: the redirect shouldn't carry a usable <code>?status=success</code> at all, only a <strong>reference ID</strong> the merchant has to exchange with our server for the real payment state. Stripe works this way, returning a session ID on the redirect and telling merchants to <a class="src-link" href="https://docs.stripe.com/payments/checkout/custom-success-page" target="_blank" rel="noopener">verify server-side rather than rely on the redirect for fulfillment</a>. If the redirect can't tell you a payment succeeded, nobody can accidentally build on it.</p>
@@ -875,31 +875,19 @@
     <p style="margin:0"><span class="lbl" style="font-weight:700;color:var(--ink)">Supporting layers:</span> a sandbox certification check at onboarding that confirms fulfillment keys off the confirmed payment state before go-live (this bug surfaced only three weeks in, exactly what a pre-launch check would catch), and a dashboard alert for any <code>AUTHORIZED</code> intent left uncaptured near its expiry window, to protect merchants who onboarded earlier.</p>
   </div>
 </section>
-
+ 
 <!-- ================= ABOUT ================= -->
-<section class="panel active" id="about">
+<section class="panel" id="about">
   <span class="eyebrow">How I worked</span>
   <h1>My Approach</h1>
-
-  <div class="profile">
-    <div class="pl">
-      <div class="nm">AHMED MOSTAFA</div>
-      <div class="ttl">Product Owner · PSPO™</div>
-      <div class="contact">
-        <a href="tel:+201022127407"><span class="ci">📞</span> +20 102 212 7407</a>
-        <a href="mailto:ahmed.mostafa.officia@gmail.com"><span class="ci">✉</span> ahmed.mostafa.officia@gmail.com</a>
-        <a href="https://linkedin.com/in/eng-ahmedmostafa" target="_blank" rel="noopener"><span class="ci">in</span> linkedin.com/in/eng-ahmedmostafa</a>
-      </div>
-    </div>
-  </div>
-
+ 
   <p class="lead">The brief asks to see how I actually work. The note at the top of each part covers the thinking behind that answer; this page covers what held across all three, and where AI helped.</p>
-
+ 
   <div class="approach-note">
     <span class="an-ic">i</span>
     <p><strong>Where I started:</strong> the brief says every line has to be mine to defend in the live review, so that's how I worked. I used AI for two things, finding primary sources and arguing against my own claims. The decisions, trade-offs and recommendations are mine, and I can defend them without the tool in the room.</p>
   </div>
-
+ 
   <div class="steps-tl">
     <div class="tl-item">
       <h4>Read the whole brief first, then framed the real ask</h4>
@@ -914,7 +902,7 @@
       <p>Two of the tasks are communication tasks, so I wrote them as such. The merchant note avoids jargon a non-payments person would have to look up, and the Souq&amp;Co reply is an email I'd actually send: clear, and not talking down to a customer who made an honest mistake.</p>
     </div>
   </div>
-
+ 
   <div class="ai-grid">
     <div class="ai-card did">
       <h4>&#10003; What I did throughout</h4>
@@ -932,19 +920,30 @@
       </ul>
     </div>
   </div>
+  <div class="profile">
+    <div class="pl">
+      <div class="nm">AHMED MOSTAFA</div>
+      <div class="ttl">Product Owner · PSPO™</div>
+      <div class="contact">
+        <a href="tel:+201022127407"><span class="ci">📞</span> +20 102 212 7407</a>
+        <a href="mailto:ahmed.mostafa.officia@gmail.com"><span class="ci">✉</span> ahmed.mostafa.officia@gmail.com</a>
+        <a href="https://linkedin.com/in/eng-ahmedmostafa" target="_blank" rel="noopener"><span class="ci">in</span> linkedin.com/in/eng-ahmedmostafa</a>
+      </div>
+    </div>
+  </div>
 </section>
-
+ 
 </main>
-
+ 
 <footer>
   <span><strong>Ahmed Mostafa</strong></span>
   <span>MoneyHash · Product Manager Case Assessment</span>
 </footer>
-
+ 
 <script>
   const tabs = Array.from(document.querySelectorAll('#tabs button'));
   const panels = Array.from(document.querySelectorAll('.panel'));
-
+ 
   function show(id, push){
     if(!panels.some(p => p.id === id)) return;
     tabs.forEach(b => {
@@ -956,7 +955,7 @@
     panels.forEach(p => p.classList.toggle('active', p.id === id));
     if(push && history.replaceState) history.replaceState(null, '', '#' + id);
   }
-
+ 
   tabs.forEach((btn, i) => {
     btn.addEventListener('click', () => {
       show(btn.dataset.tab, true);
@@ -972,7 +971,7 @@
       window.scrollTo({top:0, behavior:'smooth'});
     });
   });
-
+ 
   // open directly on a shared section, e.g. ...#p3
   const start = location.hash.replace('#','');
   if(start) show(start, false);
@@ -980,3 +979,4 @@
 </script>
 </body>
 </html>
+ 

@@ -547,11 +547,11 @@
   <div class="sol-flow">
     <div class="sol-step">
       <span class="badge src">Sourced</span>
-      <div class="body">This is a <strong>Standing Instruction</strong>: a sub-type of Merchant-Initiated Transaction (MIT), not a recurring payment. Recurring means a fixed amount on a fixed schedule; this fires on a balance event. One Customer-Initiated Transaction (CIT) captures consent, and every top-up after is a tagged MIT, specifically an <a class="src-link" href="https://developer.visaacceptance.com/docs/vas/en-us/credentials/developer/ctv/rest/credentials/credentials-intro.html" target="_blank" rel="noopener">Unscheduled Card-on-File charge</a>, which Visa defines as a non-scheduled charge under a customer's prior authorization (Mastercard's framing is equivalent, with its own tagging). A balance-triggered reload is exactly that.</div>
+      <div class="body">This is a <strong>Standing Instruction</strong>: a sub-type of Merchant-Initiated Transaction (MIT), not a recurring payment. Recurring means a fixed amount on a fixed schedule; this fires on a balance event. One Customer-Initiated Transaction (CIT) captures consent, and every top-up after is a tagged MIT, specifically an <a class="src-link" href="https://developer.visaacceptance.com/docs/vas/en-us/credentials/developer/ctv/rest/credentials/credentials-intro.html" target="_blank" rel="noopener">Unscheduled Card-on-File charge</a>, which Visa defines as a non-scheduled charge under a customer's prior authorization (Mastercard's framing is equivalent, with its own tagging).</div>
     </div>
     <div class="sol-step">
       <span class="badge rec">Recommended</span>
-      <div class="body"><strong>My recommendation:</strong> store the card as a <a class="src-link" href="https://www.visaacceptance.com/en-us/blog/article/2025/tokens-are-key-to-future-proofing-payments.html" target="_blank" rel="noopener">network token</a> with MoneyHash as the Token Requestor. Visa's position is that scheme tokens can be managed across gateways and acquirers rather than sitting with one. That portability is what makes failover possible here, though using it as an outage path is my inference, not something Visa claims. Pairing it with 3DS decoupling lets a retry skip re-authentication. <em>One caveat: a correctly tagged MIT is designed so no customer action is expected, but an issuer can still step up or soft-decline. "No re-auth" is the design intent, not something I can promise on the issuer's behalf.</em></div>
+      <div class="body"><strong>My recommendation:</strong> store the card as a <a class="src-link" href="https://www.visaacceptance.com/en-us/blog/article/2025/tokens-are-key-to-future-proofing-payments.html" target="_blank" rel="noopener">network token</a> with MoneyHash as the Token Requestor. Visa's position is that scheme tokens can be managed across gateways and acquirers rather than sitting with one. That portability is what makes failover possible here, though using it as an outage path is my inference, not Visa's claim. Pairing it with 3DS decoupling lets a retry skip re-authentication. <em>One caveat: a correctly tagged MIT expects no customer action, but an issuer can still step up or soft-decline. "No re-auth" is the design intent, not a promise I can make for the issuer.</em></div>
     </div>
     <div class="sol-step">
       <span class="badge lim">Limitation</span>
@@ -564,13 +564,22 @@
     <div class="sol-step">
       <span class="badge lim">Rejected</span>
       <div class="body">
-        <strong>Retry the same provider after a delay.</strong> Doesn't solve an outage. If the provider is down, the retry fails too, and it adds ambiguous results to reconcile.<br>
-        <strong>Ask users to store a backup card upfront.</strong> Reintroduces exactly the friction Hawil asked us to remove, and a second card doesn't help when the problem is the provider, not the card.<br>
-        <strong>MoneyHash polling Hawil's balances.</strong> Unnecessary load and it moves rule ownership to the wrong side. Hawil owns the wallet, so Hawil owns the trigger.<br>
-        <strong>Storing raw PAN instead of a network token.</strong> Heavier PCI scope, no scheme-level benefits (auto-updated credentials, better auth rates), and no portability advantage.
+        <strong>Retry the same provider after a delay.</strong> A retry into a provider that's down just adds ambiguous results to reconcile.<br>
+        <strong>Ask users to store a backup card upfront.</strong> Reintroduces the friction Hawil asked us to remove, and a second card doesn't help when the provider is the problem, not the card.<br>
+        <strong>MoneyHash polling Hawil's balances.</strong> Hawil owns the wallet, so Hawil owns the trigger. Polling adds load and puts the rule on the wrong side.<br>
+        <strong>Storing raw PAN instead of a network token.</strong> Heavier PCI scope, no scheme-level benefits, no portability.
       </div>
     </div>
   </div>
+ 
+  <h3>How it works, end to end</h3>
+  <ol>
+    <li><strong>Setup, once.</strong> The user sets the rule in-app and completes a first CIT with a 3DS step-up, either a real top-up or an account verification. That transaction is tagged as storing the credential for future unscheduled charges, and we keep the mandate (threshold, reload amount, any caps) against it.</li>
+    <li><strong>Store.</strong> We provision a network token for that card, so later charges don't depend on the PAN or on one provider's vault.</li>
+    <li><strong>Trigger.</strong> Balance crosses the threshold, Hawil sends us a trigger event carrying an idempotency key.</li>
+    <li><strong>Charge.</strong> We charge the primary provider with the token, tagged as a standing-instruction MIT and referencing the original CIT, which is what tells the issuer this is a pre-authorized reload rather than a fresh card-not-present attempt.</li>
+    <li><strong>Confirm.</strong> We webhook the outcome to Hawil, who credits the wallet. Anything that isn't a clean success drops into the failover logic below.</li>
+  </ol>
  
   <h2>3 · Failover logic</h2>
   <p>The obvious two-branch logic (outage → backup, decline → stop) misses the case that actually matters: <strong>timeout / unknown status</strong>, where the primary never answers before the window closes. Fail over blindly there and you risk <strong>two successful charges on two rails</strong> for one event. Idempotency keys protect against duplicate <em>triggers</em>, not this.</p>
@@ -642,7 +651,7 @@
     <div class="caption">Overview flow. The full written logic below adds the timeout / unknown-status branch, the hardest case, deliberately kept off the overview diagram for clarity.</div>
   </div>
  
-  <p>Full logic, including the timeout case the overview diagram simplifies:</p>
+  
   <div class="branches">
     <div class="bhead">MIT charge → Primary Provider <span class="chip">4 outcomes</span></div>
     <div class="brow">
@@ -675,13 +684,11 @@
     </div>
   </div>
  
-  <div class="flag"><strong>Two safeguards doing two different jobs:</strong> an <strong>idempotency key</strong> stops the <em>same request</em> from charging twice. It does <em>not</em> tell us whether Provider A actually captured after a timeout. That's what a <strong>status inquiry</strong> is for. Idempotency alone can't prevent a <code>Provider A (silently succeeded) → Provider B</code> double charge, because those are two charges on two different rails, not one repeated request. The status inquiry is the piece that closes that gap.</div>
+  <div class="flag"><strong>Two safeguards doing two different jobs:</strong> an <strong>idempotency key</strong> stops the <em>same request</em> from charging twice, and both Stripe and Adyen let you reuse one to safely retry a timed-out call (<a class="src-link" href="https://docs.adyen.com/development-resources/api-idempotency" target="_blank" rel="noopener">Adyen documents this for timeouts</a>). What it can't stop is <code>Provider A (silently succeeded) → Provider B</code>, because that's two charges on two rails, not one repeated request. Only a <strong>status inquiry</strong>, looking the transaction up by its key on the provider's side, closes that gap.</div>
  
   <div class="card" style="border-top:3px solid var(--green)">
-    <p style="margin:0 0 9px"><strong>None of this is novel, it's standard practice:</strong></p>
+    <p style="margin:0 0 9px"><strong>Two supporting practices this design leans on:</strong></p>
     <ul style="margin:0;padding-left:18px">
-      <li style="margin-bottom:7px"><strong>Same-key safe retry on timeout.</strong> Both Stripe and Adyen let you safely retry a timed-out call with the <em>same idempotency key</em>: if the platform already processed it, you get the original result back instead of a second charge. <a class="src-link" href="https://docs.adyen.com/development-resources/api-idempotency" target="_blank" rel="noopener">Adyen documents exactly this for timeouts</a>. So on our own primary attempt, the first move on a timeout is a same-key retry, and only if that can't resolve the outcome do we treat it as unknown.</li>
-      <li style="margin-bottom:7px"><strong>"Get by idempotency key" for the unknown case.</strong> For a genuinely ambiguous result, the right tool is to look the transaction up by its key on the provider side before acting, rather than firing the backup blind. That's the reconciliation step in the "still unknown" branch above.</li>
       <li style="margin-bottom:7px"><strong>Idempotent webhook handling + ordering.</strong> Webhooks get redelivered and can arrive out of order (a "succeeded" before its "processing"). So the receiver must be idempotent too and key off the final state, not arrival order. <a class="src-link" href="https://docs.stripe.com/webhooks" target="_blank" rel="noopener">Stripe calls this out as a webhook best practice</a>, alongside signature verification.</li>
       <li><strong>Circuit breaker on a failing provider.</strong> Once a provider is clearly down, stop sending it new charges for a cooldown window and route to the backup, rather than hammering it and generating more timeouts to reconcile. A standard resilience pattern, and it keeps the ambiguous-result volume low during an outage.</li>
     </ul>
@@ -727,8 +734,7 @@
         <li>Recovery rate <em>during confirmed outage windows</em>, and how much of it came via failover (this is the number that proves the outage requirement is met; overall zero-action rate can look healthy while the hard case fails)</li>
         <li>Duplicate-charge rate <em>(the central risk of this feature, so we measure it directly, target: effectively zero)</em></li>
         <li>False-failover rate <em>(times we failed over when the primary had actually succeeded)</em></li>
-        <li>Decline-rate trend over time</li>
-        <li>Rate of "unknown status" holds needing manual reconciliation</li>
+                <li>Rate of "unknown status" holds needing manual reconciliation</li>
         <li>% of enrolled users who keep auto top-up active after 30 days <em>(the real signal: do users trust it enough to leave it on)</em></li>
       </ul>
     </div>
@@ -753,7 +759,9 @@
         <li>If <strong>declined</strong> → no retry, decline webhook to Hawil</li>
         <li>If a <strong>clear provider error</strong> → retry via backup, same token, no re-auth</li>
         <li>If <strong>timeout / no response</strong> → resolve the outcome first: same-key retry, then a status lookup. Only retry via backup once failure is confirmed. If the state is still unknown past a grace period, hold and flag for reconciliation rather than firing the backup</li>
-        <li>An <strong>idempotency key</strong> per trigger prevents duplicate triggers creating duplicate charges</li>
+        <li>If the <strong>backup also fails or times out</strong> → stop there, notify Hawil, no third attempt</li>
+        <li>If the <strong>rule is paused or cancelled</strong> → reject the trigger, no charge</li>
+        <li>A <strong>repeat trigger with the same idempotency key</strong> returns the original result rather than charging again</li>
         <li>On <strong>success or full failure</strong> → webhook to Hawil</li>
       </ul>
     </div>
@@ -776,9 +784,9 @@
     <h4>Auto top-up: how it'll work</h4>
     <p>Once a user sets their rule (for example, "top up 200 AED whenever my balance drops below 50 AED"), we take care of the rest automatically. There's no app to open, no one-time code sent by SMS, and no re-typing card details.</p>
     <p><span class="lbl">On your side:</span> one thing. Your app tells us the moment a user's balance drops below their limit. We handle everything after that message.</p>
-    <p><span class="lbl">What users experience:</span> nothing at all. The top-up happens quietly in the background. We save the card in a way that lets it work with more than one payment company, not just a single one. So if the main payment company we're using stops working for a while (like the two times that happened to you last quarter), we simply complete the top-up through a backup payment company, using the same saved card. In almost all cases the user won't need to do anything or even know it happened. (Occasionally a bank may ask the user to confirm a payment for security; that's the bank's call, not something we can switch off, but for this kind of automatic reload it's rare.)</p>
-    <p><span class="lbl">What to keep in mind:</span> the backup only helps when the <em>payment company</em> has a problem, not when the <em>card</em> does. If a card has expired or has no money on it, nobody can push the payment through. We'll tell you rather than quietly retrying, so you can let the user know.</p>
-    <p style="margin-bottom:0">Which cards this covers depends on the payment methods live on your account, so I won't guess. Here's <a class="src-link" href="https://moneyhash.io/Integrations" target="_blank" rel="noopener">the full list we support</a>. Tell us which ones matter most to your users and we'll confirm they're ready for auto top-up.</p>
+    <p><span class="lbl">What users experience:</span> nothing at all, it happens quietly in the background. We save the card in a way that works with more than one payment company, so if the main one goes down (like the two outages last quarter), we complete the reload through a backup using the same saved card. Occasionally a bank may still ask the user to confirm for security. That's the bank's call, not something we can switch off, though it's rare for automatic reloads.</p>
+    <p><span class="lbl">What to keep in mind:</span> the backup helps when the <em>payment company</em> has a problem, not when the <em>card</em> does. An expired card, or one with no money on it, can't be pushed through by anyone. We'll tell you rather than quietly retrying, so you can let the user know.</p>
+    <p style="margin-bottom:0">Which cards this covers depends on the payment methods live on your account, so I won't guess. Here's <a class="src-link" href="https://moneyhash.io/Integrations" target="_blank" rel="noopener">the full list we support</a>, tell us which matter most and we'll confirm they're ready.</p>
     </div>
   </div>
 </section>
@@ -1001,3 +1009,4 @@
 </script>
 </body>
 </html>
+ 

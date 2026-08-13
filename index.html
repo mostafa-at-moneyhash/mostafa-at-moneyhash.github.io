@@ -534,32 +534,40 @@
   </div>
   <div class="flag"><strong>Assumptions, architecture-defining, so I'd confirm these with Hawil first:</strong> Hawil pushes a trigger event when the balance crosses the threshold. The whole webhook and idempotency design rests on that. Setup is one in-app CIT with a 3DS step-up; that's expected for card-not-present in the GCC anyway, so I'm relying on it rather than treating it as a trade-off. And a boundary worth naming early: Hawil owns the wallet and the stored-value licensing (CBUAE SVF, SAMA), MoneyHash owns the card-in leg.</div>
   <h3>Questions for Hawil</h3>
+  <p style="font-size:14px;margin-bottom:8px">Only the things I can't answer from our own side:</p>
   <ul>
     <li>Does your app send us the trigger when a balance crosses the threshold, or would you expect us to track balances ourselves?</li>
-    <li>Do you already have a second provider integrated that we could fail over to?</li>
     <li>On a hard failure (both providers down, or the card declined), should we retry silently later or notify the user right away?</li>
     <li>Is there a cap on the top-up amount or how often it can fire per day? (Important for abuse and fraud limits.)</li>
     <li>Roughly how many top-ups a day do you expect, and in which markets? (This shapes how many backup providers are worth wiring up, and whether mada matters.)</li>
-    <li>Any GCC regulatory limits on standing-instruction charges we should account for?</li>
   </ul>
  
   <h2>2 · Solution space</h2>
   <div class="sol-flow">
     <div class="sol-step">
       <span class="badge src">Sourced</span>
-      <div class="body">This is a <strong>Standing Instruction</strong>: a sub-type of Merchant-Initiated Transaction (MIT), not a recurring payment. Recurring means a fixed amount on a fixed schedule; this fires on a balance event. One Customer-Initiated Transaction (CIT) captures consent, and every top-up after is a tagged MIT, specifically an <a class="src-link" href="https://developer.visaacceptance.com/docs/vas/en-us/credentials/developer/ctv/rest/credentials/credentials-intro.html" target="_blank" rel="noopener">Unscheduled Card-on-File charge</a>, which Visa defines as a non-scheduled charge under a customer's prior authorization (Mastercard's framing is equivalent, with its own tagging).</div>
+      <div class="body">This is a <strong>Standing Instruction</strong>: a sub-type of Merchant-Initiated Transaction (MIT), not a recurring payment. Recurring means a fixed amount on a fixed schedule; this fires on a balance event. One Customer-Initiated Transaction (CIT) captures consent, and every top-up after is a tagged MIT, specifically an <a class="src-link" href="https://developer.visaacceptance.com/docs/vas/en-us/credentials/developer/ctv/rest/credentials/credentials-intro.html" target="_blank" rel="noopener">Unscheduled Card-on-File charge</a>, which Visa defines as a non-scheduled charge under a customer's prior authorization. Visa's own reason-code list even names <strong>"Account Top Up"</strong> as a valid MIT reason, Hawil's exact case. (Mastercard's framing is equivalent, with its own tagging.)</div>
     </div>
     <div class="sol-step">
       <span class="badge rec">Recommended</span>
-      <div class="body"><strong>My recommendation:</strong> store the card as a <a class="src-link" href="https://www.visaacceptance.com/en-us/blog/article/2025/tokens-are-key-to-future-proofing-payments.html" target="_blank" rel="noopener">network token</a> with MoneyHash as the Token Requestor. Visa's position is that scheme tokens can be managed across gateways and acquirers rather than sitting with one. That portability is what makes failover possible here, though using it as an outage path is my inference, not Visa's claim. Pairing it with 3DS decoupling lets a retry skip re-authentication. <em>One caveat: a correctly tagged MIT expects no customer action, but an issuer can still step up or soft-decline. "No re-auth" is the design intent, not a promise I can make for the issuer.</em></div>
+      <div class="body"><strong>My recommendation:</strong> store the card as a <a class="src-link" href="https://www.visaacceptance.com/en-us/blog/article/2025/tokens-are-key-to-future-proofing-payments.html" target="_blank" rel="noopener">network token</a> with MoneyHash as the Token Requestor. Two things make this work:
+        <ul style="margin:8px 0 0;padding-left:18px">
+          <li style="margin-bottom:6px"><strong>Portability across providers.</strong> Visa's position is that scheme tokens can be managed across gateways and acquirers rather than sitting with one. <em>That's what enables failover, though using it as an outage path is my inference, not Visa's claim.</em></li>
+          <li style="margin-bottom:0"><strong>No re-auth on repeat charges.</strong> Pairing the token with the original CIT keeps the friction out: a correctly tagged MIT sits outside SCA scope (merchant-initiated, not customer-initiated) and references the authenticated setup rather than authenticating again. <em>Design intent, not a guarantee, an issuer can still step up or soft-decline, so "no re-auth" is what we expect for eligible charges, not a promise I can make on the issuer's behalf.</em></li>
+        </ul></div>
     </div>
     <div class="sol-step">
       <span class="badge lim">Limitation</span>
-      <div class="body">Portability isn't automatic. Token Requestor approval means scheme certification, which is real onboarding work rather than a config flag, and every backup acquirer has to accept a token it didn't provision. The bigger dependency: this assumes MoneyHash runs its own vault as Token Requestor rather than passing through to PSPs that each hold their own tokens. If it's the latter, cross-provider portability mostly disappears and failover needs rethinking around each PSP's credentials. I'd confirm which model we actually run before anything else. <strong>mada</strong> may not support cross-acquirer portability at all, in which case failover won't extend to mada cards.</div>
+      <div class="body">Portability isn't automatic.
+        <ul style="margin:8px 0 0;padding-left:18px">
+          <li style="margin-bottom:6px"><strong>Certification cost.</strong> Token Requestor approval means scheme certification, real onboarding work rather than a config flag, and every backup acquirer has to accept a token it didn't provision.</li>
+          <li style="margin-bottom:6px"><strong>The vault dependency.</strong> This assumes MoneyHash runs its own vault as Token Requestor, not pass-through to PSPs holding their own tokens. If it's pass-through, cross-provider portability mostly disappears. I'd confirm which model we run before anything else, and if we're pass-through I'd drop cross-provider failover for v1, and limit recovery to same-provider retry, rather than promise an outage path we can't deliver.</li>
+          <li style="margin-bottom:0"><strong>mada.</strong> May not support cross-acquirer portability at all, in which case failover won't extend to mada cards.</li>
+        </ul></div>
     </div>
     <div class="sol-step">
       <span class="badge mine">My call</span>
-      <div class="body">One backup provider for v1. Declines are terminal, not retried across providers, until we have decline-code data to justify it. And where portability isn't available for a card or market, that card doesn't get failover in v1: it drops back to single-provider with notify-on-failure rather than something half-working.</div>
+      <div class="body">One backup provider for v1. Declines are terminal, not retried across providers, until we have decline-code data to justify it. And where portability isn't available for a card or market, that card doesn't get cross-provider failover in v1: it drops back to single-provider, same-provider retry once it recovers, notify-on-failure otherwise, rather than something half-working.</div>
     </div>
     <div class="sol-step">
       <span class="badge lim">Rejected</span>
@@ -574,12 +582,13 @@
  
   <h3>How it works, end to end</h3>
   <ol>
-    <li><strong>Setup, once.</strong> The user sets the rule in-app and completes a first CIT with a 3DS step-up, either a real top-up or an account verification. That transaction is tagged as storing the credential for future unscheduled charges, and we keep the mandate (threshold, reload amount, any caps) against it.</li>
+    <li><strong>Setup, once.</strong> The user sets the rule in-app and completes a first CIT with a 3DS step-up, either a real top-up or an account verification. That transaction is tagged as storing the credential for future unscheduled charges, and we keep the mandate against it: the consent, the reload amount, and the caps. <em>The threshold itself stays on Hawil's side. They can see the balance, we can't and shouldn't, and holding their trigger rule would give us a window into wallet balances we have no reason to hold.</em></li>
     <li><strong>Store.</strong> We provision a network token for that card, so later charges don't depend on the PAN or on one provider's vault.</li>
     <li><strong>Trigger.</strong> Balance crosses the threshold, Hawil sends us a trigger event carrying an idempotency key.</li>
     <li><strong>Charge.</strong> We charge the primary provider with the token, tagged as a standing-instruction MIT and referencing the original CIT, which is what tells the issuer this is a pre-authorized reload rather than a fresh card-not-present attempt.</li>
     <li><strong>Confirm.</strong> We webhook the outcome to Hawil, who credits the wallet. Anything that isn't a clean success drops into the failover logic below.</li>
   </ol>
+  <div class="note"><strong>The failure mode on this side is the mirror of a double charge:</strong> if that confirmation is lost, we've collected the money and the user's balance never moves. Same correctness problem, pointed the other way, and worse for trust because the user is out of pocket. So delivery can't be assumed: every trigger's outcome stays queryable by its key, and Hawil reconciles anything still open rather than re-triggering it.</div>
  
   <h2>3 · Failover logic</h2>
   <p>The obvious two-branch logic (outage → backup, decline → stop) misses the case that actually matters: <strong>timeout / unknown status</strong>, where the primary never answers before the window closes. Fail over blindly there and you risk <strong>two successful charges on two rails</strong> for one event. Idempotency keys protect against duplicate <em>triggers</em>, not this.</p>
@@ -648,27 +657,12 @@
       <rect x="516" y="452" width="125" height="44" rx="10" fill="#FCEBEB" stroke="#E24B4A" stroke-width=".8"/>
       <text class="dt" x="578" y="478" text-anchor="middle" fill="#A32D2D">Notify Hawil</text>
     </svg>
-    <div class="caption">Overview flow. The full written logic below adds the timeout / unknown-status branch, the hardest case, deliberately kept off the overview diagram for clarity.</div>
+    <div class="caption">The three clean outcomes. The fourth, where the primary never answers, is below.</div>
   </div>
  
   
   <div class="branches">
-    <div class="bhead">MIT charge → Primary Provider <span class="chip">4 outcomes</span></div>
-    <div class="brow">
-      <span class="cond"><span class="bdot ok"></span>Success</span>
-      <span class="arrow">→</span>
-      <span class="out"><strong>Done.</strong></span>
-    </div>
-    <div class="brow">
-      <span class="cond"><span class="bdot bad"></span>Card declined</span>
-      <span class="arrow">→</span>
-      <span class="out">Notify Hawil. <strong>No retry</strong>, a decline is a card problem, not a provider one.</span>
-    </div>
-    <div class="brow">
-      <span class="cond"><span class="bdot warn"></span>Clear provider error</span>
-      <span class="arrow">→</span>
-      <span class="out">Retry via Backup, <strong>same token, no re-auth</strong>. (5xx, connection refused.)</span>
-    </div>
+    <div class="bhead">The fourth outcome <span class="chip">not on the diagram</span></div>
     <div class="brow hl">
       <div class="toprow">
         <span class="cond"><span class="bdot warn"></span>Timeout / no reply</span>
@@ -677,10 +671,15 @@
         <span class="tag-hard">the hard case</span>
       </div>
       <div class="subtree">
-        <div class="subrow"><span class="sarr">└</span> Same-key retry, then status lookup <span class="sarr">→</span> <strong>confirmed failed</strong> <span class="sarr">→</span> retry via Backup</div>
+        <div class="subrow"><span class="sarr">└</span> Same-key retry, then status lookup <span class="sarr">→</span> <strong>confirmed failed</strong> <span class="sarr">→</span> retry via Backup <em style="color:var(--muted)">(which runs the same resolve-before-acting rule)</em></div>
         <div class="subrow"><span class="sarr">└</span> <strong>Confirmed succeeded</strong> <span class="sarr">→</span> done, no backup charge</div>
-        <div class="subrow"><span class="sarr">└</span> Still <strong>unknown</strong> <span class="sarr">→</span> hold + flag for manual reconciliation <em style="color:var(--muted)">(do not auto-fire backup)</em></div>
+        <div class="subrow"><span class="sarr">└</span> Still <strong>unknown</strong> <span class="sarr">→</span> hold + flag for manual reconciliation, and the <strong>wallet stays untouched</strong> until confirmed <em style="color:var(--muted)">(better to leave the user below threshold than credit a top-up we're not sure we collected)</em></div>
       </div>
+    </div>
+    <div class="brow" style="background:#F7F9FC">
+      <span class="cond"><span class="bdot warn"></span>Bounded, not infinite</span>
+      <span class="arrow">→</span>
+      <span class="out">Retries and status lookups run to a <strong>fixed ceiling and grace window</strong>, then stop rather than looping.</span>
     </div>
   </div>
  
@@ -689,18 +688,18 @@
   <div class="card" style="border-top:3px solid var(--green)">
     <p style="margin:0 0 9px"><strong>Two supporting practices this design leans on:</strong></p>
     <ul style="margin:0;padding-left:18px">
-      <li style="margin-bottom:7px"><strong>Idempotent webhook handling + ordering.</strong> Webhooks get redelivered and can arrive out of order (a "succeeded" before its "processing"). So the receiver must be idempotent too and key off the final state, not arrival order. <a class="src-link" href="https://docs.stripe.com/webhooks" target="_blank" rel="noopener">Stripe calls this out as a webhook best practice</a>, alongside signature verification.</li>
+      <li style="margin-bottom:7px"><strong>Idempotent webhook handling + ordering.</strong> Webhooks get redelivered and can arrive out of order (a "succeeded" before its "processing"). So the receiver must be idempotent too and key off the final state, not arrival order. <a class="src-link" href="https://docs.stripe.com/webhooks" target="_blank" rel="noopener">Stripe calls this out as a webhook best practice</a>. Stripe documents both, as separate best practices.</li>
       <li><strong>Circuit breaker on a failing provider.</strong> Once a provider is clearly down, stop sending it new charges for a cooldown window and route to the backup, rather than hammering it and generating more timeouts to reconcile. A standard resilience pattern, and it keeps the ambiguous-result volume low during an outage.</li>
     </ul>
   </div>
  
   <div class="tablewrap">
     <table>
-      <tr><th>Decision</th><th>Call</th><th>Validate</th></tr>
-      <tr><td>Token ownership</td><td>MoneyHash-owned network token</td><td>Confirm platform capability, then per-scheme portability, especially mada</td></tr>
-      <tr><td>Timeout handling</td><td>Same-key retry first, then status inquiry, never blind failover</td><td>Define timeout / grace-period thresholds with engineering</td></tr>
-      <tr><td>Decline vs. outage</td><td>Only confirmed outages trigger failover</td><td>Revisit with decline-code data</td></tr>
-      <tr><td>Cascade depth</td><td>1 backup for v1</td><td>Expand with real outage data</td></tr>
+      <tr><th>Decision</th><th>Call</th><th>Trade-off</th><th>Validate</th></tr>
+      <tr><td>Token ownership</td><td>MoneyHash-owned network token</td><td>Buys cross-provider portability, but adds scheme certification and a hard dependency on us running the vault</td><td>Confirm platform capability, then per-scheme portability, especially mada</td></tr>
+      <tr><td>Timeout handling</td><td>Same-key retry first, then status inquiry, never blind failover</td><td>Safest against double charges, but adds latency before a top-up completes</td><td>Define timeout / grace-period thresholds with engineering</td></tr>
+      <tr><td>Decline vs. outage</td><td>Only confirmed outages trigger failover</td><td>Avoids fraud and dispute risk, but a soft decline (issuer down, temporary limit) recovers nothing in v1</td><td>Revisit with decline-code data</td></tr>
+      <tr><td>Cascade depth</td><td>1 backup for v1</td><td>Covers the common single-provider outage, but a rare dual-provider outage still fails</td><td>Expand with real outage data</td></tr>
     </table>
   </div>
  
@@ -711,9 +710,9 @@
       <ul>
         <li>CIT setup (card + 3DS consent)</li>
         <li>MIT charge with correct standing-instruction tags</li>
-        <li>Status-check before failover to one backup provider</li>
-        <li>Transaction status inquiry / reconciliation (the piece that makes outage-safe failover possible without double charging)</li>
+        <li>Status inquiry before failover, and reconciliation for anything that stays unresolved</li>
         <li>Idempotency on both sides: request keys to prevent double charges, and idempotent webhook handling for redelivered or out-of-order events</li>
+        <li>Per-rule caps on amount and daily frequency, enforced our side <em>(a compromised account shouldn't be able to reload a card indefinitely)</em></li>
         <li>Failure notification (push)</li>
         <li>Rule pause / cancellation <em>(deliberately in scope: anything that auto-charges a card needs a stop button on day one)</em></li>
       </ul>
@@ -730,12 +729,12 @@
     <div class="scope-col met wide">
       <div class="sh"><span class="si">%</span> How we measure success</div>
       <ul>
+        <li><strong>Top-up success rate (any path)</strong> <em>the north-star: of all triggers, how many ended in a completed reload, before we look at how</em></li>
         <li>% of triggers completed with zero user action</li>
         <li>Recovery rate <em>during confirmed outage windows</em>, and how much of it came via failover (this is the number that proves the outage requirement is met; overall zero-action rate can look healthy while the hard case fails)</li>
         <li>Duplicate-charge rate <em>(the central risk of this feature, so we measure it directly, target: effectively zero)</em></li>
         <li>False-failover rate <em>(times we failed over when the primary had actually succeeded)</em></li>
-                <li>Rate of "unknown status" holds needing manual reconciliation</li>
-        <li>% of enrolled users who keep auto top-up active after 30 days <em>(the real signal: do users trust it enough to leave it on)</em></li>
+                <li>% of enrolled users who keep auto top-up active after 30 days <em>(the real signal: do users trust it enough to leave it on)</em></li>
       </ul>
     </div>
   </div>
@@ -760,8 +759,9 @@
         <li>If a <strong>clear provider error</strong> → retry via backup, same token, no re-auth</li>
         <li>If <strong>timeout / no response</strong> → resolve the outcome first: same-key retry, then a status lookup. Only retry via backup once failure is confirmed. If the state is still unknown past a grace period, hold and flag for reconciliation rather than firing the backup</li>
         <li>If the <strong>backup also fails or times out</strong> → stop there, notify Hawil, no third attempt</li>
-        <li>If the <strong>rule is paused or cancelled</strong> → reject the trigger, no charge</li>
+        <li>If the <strong>rule is paused, cancelled, or over its cap</strong> → reject the trigger, no charge</li>
         <li>A <strong>repeat trigger with the same idempotency key</strong> returns the original result rather than charging again</li>
+        <li>Every trigger's final outcome stays <strong>queryable by its key</strong>, so a lost confirmation is a reconciliation rather than a re-charge</li>
         <li>On <strong>success or full failure</strong> → webhook to Hawil</li>
       </ul>
     </div>
@@ -785,7 +785,7 @@
     <p>Once a user sets their rule (for example, "top up 200 AED whenever my balance drops below 50 AED"), we take care of the rest automatically. There's no app to open, no one-time code sent by SMS, and no re-typing card details.</p>
     <p><span class="lbl">On your side:</span> one thing. Your app tells us the moment a user's balance drops below their limit. We handle everything after that message.</p>
     <p><span class="lbl">What users experience:</span> nothing at all, it happens quietly in the background. We save the card in a way that works with more than one payment company, so if the main one goes down (like the two outages last quarter), we complete the reload through a backup using the same saved card. Occasionally a bank may still ask the user to confirm for security. That's the bank's call, not something we can switch off, though it's rare for automatic reloads.</p>
-    <p><span class="lbl">What to keep in mind:</span> the backup helps when the <em>payment company</em> has a problem, not when the <em>card</em> does. An expired card, or one with no money on it, can't be pushed through by anyone. We'll tell you rather than quietly retrying, so you can let the user know.</p>
+    <p><span class="lbl">What to keep in mind:</span> the backup helps when the <em>payment company</em> has a problem, not when the <em>card</em> does. An expired card, or one with no money on it, can't be pushed through by anyone. We'll tell you rather than quietly retrying, so you can let the user know. One thing we'll confirm with you at setup: whether the backup route is available for your specific card mix, since a few card types can't be switched between providers.</p>
     <p style="margin-bottom:0">Which cards this covers depends on the payment methods live on your account, so I won't guess. Here's <a class="src-link" href="https://moneyhash.io/Integrations" target="_blank" rel="noopener">the full list we support</a>, tell us which matter most and we'll confirm they're ready.</p>
     </div>
   </div>
@@ -1009,4 +1009,3 @@
 </script>
 </body>
 </html>
- 
